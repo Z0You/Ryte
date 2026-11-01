@@ -1157,7 +1157,9 @@ function RyteStorageStep(props: {
                     alignItems: "center",
                     width: "auto",
                     cursor: "pointer",
-                    fontSize: "subtitle"
+                    fontFamily: "body",
+                    fontSize: "subtitle",
+                    color: "paragraph"
                   }}
                 >
                   <Radio

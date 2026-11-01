@@ -439,10 +439,13 @@ const doAppLoadActions = async () => {
   }
 };
 
+/** Ryte: turns off Notesnook-specific prompts (typed so code stays reachable). */
+const RYTE_DISABLED = true as boolean;
+
 const checkAppUpdateAvailable = async () => {
   // Ryte: Notesnook's update checks point at Notesnook's releases
   if (
-    true ||
+    RYTE_DISABLED ||
     __DEV__ ||
     Config.isTesting === "true" ||
     Config.FDROID_BUILD ||
@@ -467,7 +470,7 @@ const checkAppUpdateAvailable = async () => {
 
 const checkForRateAppRequest = async () => {
   // Ryte: Notesnook's store pages are not Ryte's
-  return;
+  if (RYTE_DISABLED) return;
   const rateApp = SettingsService.get().rateApp as number;
   if (
     rateApp &&

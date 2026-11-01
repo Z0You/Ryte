@@ -29,14 +29,13 @@ export class Debug {
     body: string;
     userId?: string;
   }): Promise<IssueReportResponse | undefined> {
-    const { title, body, userId } = reportData;
-    const response = await fetch(`${hosts.ISSUES_HOST}/create/notesnook`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, body, userId })
-    });
-    const json = await response.json();
-    if (!response.ok) return json;
-    return json;
+    // Ryte: never send reports to Notesnook's issue server; open a
+    // pre-filled issue on Ryte's GitHub repository instead.
+    const { title, body } = reportData;
+    void hosts;
+    const url = `https://github.com/Z0You/Ryte/issues/new?title=${encodeURIComponent(
+      title
+    )}&body=${encodeURIComponent(body.slice(0, 6000))}`;
+    return { url, type: "issue" };
   }
 }

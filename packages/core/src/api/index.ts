@@ -489,10 +489,8 @@ class Database {
   }
 
   async announcements() {
-    let url = `${Hosts.API_HOST}/announcements/active`;
-    const user = await this.user.getUser();
-    if (user) url += `?userId=${user.id}`;
-    return http.get(url);
+    // Ryte: Notesnook's announcements are about Notesnook
+    return [];
   }
 }
 

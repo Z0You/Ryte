@@ -20,16 +20,11 @@ import { expose } from "comlink";
 
 const module = {
   async waitForInternet() {
+    // Ryte: there is no Ryte server to ping; trust the browser and let
+    // MEGA / Filen report their own connection errors.
     let retries = 3;
     while (retries-- > 0) {
-      try {
-        const response = await fetch("https://api.notesnook.com/health");
-        if (response.ok) return true;
-      } catch {
-        // ignore
-      }
-
-      // wait a bit before trying again.
+      if (self.navigator.onLine !== false) return true;
       await new Promise((resolve) => setTimeout(resolve, 2500));
     }
     return false;
