@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import { ManifestOptions } from "vite-plugin-pwa";
 
 export const WEB_MANIFEST: Partial<ManifestOptions> = {
-  name: "Notesnook",
+  name: "Ryte",
   description:
-    "A fully open source & end-to-end encrypted note taking alternative to Evernote.",
-  short_name: "Notesnook",
+    "End-to-end encrypted notes with every feature included, synced through your own MEGA or Filen storage.",
+  short_name: "Ryte",
   shortcuts: [
     {
       name: "New note",

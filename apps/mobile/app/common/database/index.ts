@@ -34,6 +34,7 @@ import "./logger";
 import { RNSqliteDriver } from "./sqlite.kysely";
 import { Storage } from "./storage";
 import SettingsService from "../../services/settings";
+import { bridge, getBridgeDrive } from "../../ryte/bridge";
 
 export async function setupDatabase(password?: string) {
   const key = await getDatabaseKey(password);
@@ -90,6 +91,11 @@ export async function setupDatabase(password?: string) {
     maxNoteVersions: async () => {
       const limit = await getFeatureLimit(getFeature("maxNoteVersions"));
       return typeof limit.caption === "number" ? limit.caption : undefined;
+    },
+    // Ryte: sync through the user's MEGA / Filen drive (via the WebView bridge)
+    cloud: async () => {
+      await bridge.whenReady().catch(() => undefined);
+      return getBridgeDrive();
     }
   });
 }

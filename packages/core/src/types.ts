@@ -633,6 +633,8 @@ export enum SubscriptionProvider {
 export type User = {
   id: string;
   email: string;
+  /** Ryte: the cloud storage service this account syncs through. */
+  cloudProvider?: "mega" | "filen";
   isEmailConfirmed: boolean;
   salt: string;
   attachmentsKey?: Cipher<"base64">;

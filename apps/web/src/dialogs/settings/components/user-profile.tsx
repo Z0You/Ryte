@@ -102,7 +102,7 @@ export function UserProfile({ minimal }: Props) {
   const user = useUserStore((store) => store.user);
   const profile = useSettingStore((store) => store.profile);
 
-  const { title, trial } = getSubscriptionInfo(user);
+
 
   if (!user || !user.id)
     return (
@@ -201,7 +201,8 @@ export function UserProfile({ minimal }: Props) {
               color: "accent"
             }}
           >
-            {`${title}${trial ? " (trial)" : ""}`}
+            {/* Ryte: no plans, every feature is unlocked */}
+            {"All features unlocked"}
           </Text>
 
           <Text variant={minimal ? "body" : "subtitle"}>
@@ -234,6 +235,11 @@ export function UserProfile({ minimal }: Props) {
             )}
           </Text>
           <Text variant={"subBody"}>
+            {user.cloudProvider === "filen"
+              ? "Filen · "
+              : user.cloudProvider === "mega"
+              ? "MEGA · "
+              : ""}
             {user.email}
             {minimal ? null : (
               <>

@@ -36,8 +36,77 @@ import { RecoveryKeyDialog } from "../recovery-key-dialog";
 import { UserProfile } from "./components/user-profile";
 import { SettingsGroup } from "./types";
 import Config from "../../utils/config";
+import { ryteCloud } from "../../ryte/cloud";
+import { hardNavigate } from "../../navigation";
+import { formatBytes } from "@notesnook/common";
 
 export const ProfileSettings: SettingsGroup[] = [
+  {
+    key: "ryte-cloud-storage",
+    section: "profile",
+    header: "Cloud storage",
+    onStateChange(listener) {
+      return ryteCloud.onChange(() => listener(undefined, undefined));
+    },
+    settings: [
+      {
+        key: "ryte-cloud-status",
+        title: "Sync storage",
+        keywords: ["mega", "filen", "cloud", "storage", "sync", "quota"],
+        description: () => {
+          const status = ryteCloud.status();
+          if (!status)
+            return "Not connected. Connect MEGA or Filen to sync your notes and attachments between devices, end-to-end encrypted.";
+          const user = useUserStore.getState().user;
+          const quota =
+            user?.totalStorage && user.totalStorage > 0
+              ? ` · ${formatBytes(user.storageUsed || 0)} of ${formatBytes(
+                  user.totalStorage
+                )} used`
+              : "";
+          return `Syncing with ${status.displayName} as ${status.email}${quota}. Your notes are stored in the "Ryte" and "Ryte Files" folders of that account.`;
+        },
+        components: () =>
+          ryteCloud.status()
+            ? [
+                {
+                  type: "button",
+                  title: "Reconnect",
+                  variant: "secondary",
+                  action: async () => {
+                    const ok = await ConfirmDialog.show({
+                      title: "Reconnect cloud storage?",
+                      message:
+                        "Sign in to your MEGA or Filen account again (for example after changing its password). Your notes stay on this device.",
+                      positiveButtonText: "Reconnect",
+                      negativeButtonText: strings.cancel()
+                    });
+                    if (!ok) return;
+                    await ryteCloud.disconnect();
+                    Config.set("sessionExpired", true);
+                    hardNavigate("/sessionexpired");
+                  }
+                }
+              ]
+            : [
+                {
+                  type: "button",
+                  title: "Connect",
+                  variant: "primary",
+                  action: () => {
+                    if (useUserStore.getState().isLoggedIn)
+                      Config.set("sessionExpired", true);
+                    hardNavigate(
+                      useUserStore.getState().isLoggedIn
+                        ? "/sessionexpired"
+                        : "/login"
+                    );
+                  }
+                }
+              ]
+      }
+    ]
+  },
   {
     key: "user-profile",
     section: "profile",
@@ -48,10 +117,11 @@ export const ProfileSettings: SettingsGroup[] = [
     settings: [
       {
         key: "email",
+        // Ryte: not available without a Notesnook account
+        isHidden: () => true,
         title: strings.changeEmail(),
         description: strings.changeEmailDesc(),
         keywords: [strings.changeEmail(), strings.newEmail()],
-        isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
@@ -76,10 +146,11 @@ export const ProfileSettings: SettingsGroup[] = [
       },
       {
         key: "recovery-key",
+        // Ryte: not available without a Notesnook account
+        isHidden: () => true,
         title: strings.saveDataRecoveryKey(),
         description: strings.saveDataRecoveryKeyDesc(),
         keywords: ["data recovery", "lost your password", "backup"],
-        isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
@@ -124,10 +195,11 @@ export const ProfileSettings: SettingsGroup[] = [
       },
       {
         key: "account-removal",
+        // Ryte: not available without a Notesnook account
+        isHidden: () => true,
         title: strings.deleteAccount(),
         description: strings.deleteAccountDesc(),
         keywords: [strings.deleteAccount(), strings.clear()],
-        isHidden: () => !useUserStore.getState().isLoggedIn,
         components: [
           {
             type: "button",
@@ -179,6 +251,8 @@ export const ProfileSettings: SettingsGroup[] = [
       },
       {
         key: "logout-all-sessions",
+        // Ryte: not available without a Notesnook account
+        isHidden: () => true,
         title: strings.logoutAllOtherDevices(),
         description: strings.logoutAllOtherDevicesDescription(),
         keywords: [strings.clearSessions()],

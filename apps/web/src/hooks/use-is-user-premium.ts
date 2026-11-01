@@ -21,6 +21,8 @@ import { SubscriptionPlan, SubscriptionStatus, User } from "@notesnook/core";
 import { useStore as useUserStore } from "../stores/user-store";
 
 export function isActiveSubscription(user?: User) {
+  // Ryte: all features are available to everyone.
+  return true;
   user = user || useUserStore.getState().user;
   if (!user) return false;
 
@@ -31,6 +33,8 @@ export function isActiveSubscription(user?: User) {
   );
 }
 export function isUserSubscribed(user?: User) {
+  // Ryte: all features are available to everyone.
+  return true;
   user = user || useUserStore.getState().user;
   if (!user) return false;
 

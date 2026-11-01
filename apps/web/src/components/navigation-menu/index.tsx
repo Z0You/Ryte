@@ -146,13 +146,7 @@ const routes: Route[] = [
     path: "/reminders",
     icon: Reminders
   },
-  {
-    id: "monographs",
-    title: strings.routes.Monographs(),
-    path: "/monographs",
-    icon: Monographs,
-    loginRequired: true
-  },
+  // Ryte: "Monographs" (notes published on the web) needs Notesnook's servers
   { id: "trash", title: strings.routes.Trash(), path: "/trash", icon: Trash },
   {
     id: "archive",
@@ -350,7 +344,7 @@ function NavigationMenu({
                 display: "block"
               }}
             >
-              Notesnook
+              Ryte
             </Text>
           </Flex>
           <Flex sx={{ gap: "small", alignItems: "center" }}>

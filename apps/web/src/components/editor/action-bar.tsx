@@ -141,7 +141,8 @@ export function EditorActionBar() {
     {
       title: isNotePublished ? strings.published() : strings.publish(),
       icon: isNotePublished ? Published : Publish,
-      hidden: !isLoggedIn,
+      // Ryte: publishing needs Notesnook's servers
+      hidden: true || !isLoggedIn,
       hideOnMobile: true,
       enabled:
         activeSession &&

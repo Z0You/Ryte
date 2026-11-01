@@ -629,12 +629,12 @@ msgid "{planTitle} plan"
 msgstr "Тариф {planTitle}"
 
 #: src/strings.ts:676
-msgid "{platform, select, android {{name} saved to selected path} other {{name} saved to File Manager/Notesnook/downloads}}"
-msgstr "{platform, select, android {{name} збережено у вибраній папці} other {{name} збережено у File Manager/Notesnook/downloads}}"
+msgid "{platform, select, android {{name} saved to selected path} other {{name} saved to File Manager/Ryte/downloads}}"
+msgstr "{platform, select, android {{name} збережено у вибраній папці} other {{name} збережено у File Manager/Ryte/downloads}}"
 
 #: src/strings.ts:1236
-msgid "{platform, select, android {Backup file saved in \"Notesnook backups\" folder on your phone.} other {Backup file is saved in File Manager/Notesnook folder}}"
-msgstr "{platform, select, android {Файл резервної копії збережено в папці \"Notesnook backups\" на вашому телефоні.} other {Файл резервної копії зберігається в папці File Manager/Notesnook}}"
+msgid "{platform, select, android {Backup file saved in \"Ryte backups\" folder on your phone.} other {Backup file is saved in File Manager/Ryte folder}}"
+msgstr "{platform, select, android {Файл резервної копії збережено в папці \"Ryte backups\" на вашому телефоні.} other {Файл резервної копії зберігається в папці File Manager/Ryte}}"
 
 #: src/strings.ts:2153
 msgid "{selected} selected"
@@ -997,8 +997,8 @@ msgid "All the core features, minus the fluff."
 msgstr "Усі ключові функції без зайвого."
 
 #: src/strings.ts:1953
-msgid "All the source code for Notesnook is available & open for everyone on GitHub."
-msgstr "Увесь вихідний код Notesnook відкритий і доступний усім на GitHub."
+msgid "All the source code for Ryte is available & open for everyone on GitHub."
+msgstr "Увесь вихідний код Ryte відкритий і доступний усім на GitHub."
 
 #: src/strings.ts:385
 msgid "All tools are grouped"
@@ -1013,8 +1013,8 @@ msgid "All tools in this group will be removed from the toolbar."
 msgstr "Усі інструменти з цієї групи буде вилучено з панелі інструментів."
 
 #: src/strings.ts:1251
-msgid "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
-msgstr "Усі ваші резервні копії зберігаються в папці 'Phone Storage/Notesnook/backups/'"
+msgid "All your backups are stored in 'Phone Storage/Ryte/backups/' folder"
+msgstr "Усі ваші резервні копії зберігаються в папці 'Phone Storage/Ryte/backups/'"
 
 #: src/strings.ts:94
 msgid "Already have an account?"
@@ -1797,8 +1797,8 @@ msgid "Characters"
 msgstr "Символи"
 
 #: src/strings.ts:1197
-msgid "Check for new version of Notesnook"
-msgstr "Перевірити наявність нової версії Notesnook"
+msgid "Check for new version of Ryte"
+msgstr "Перевірити наявність нової версії Ryte"
 
 #: src/strings.ts:1200
 msgid "Check for new version of the app available on app launch"
@@ -2190,8 +2190,8 @@ msgid "Configure"
 msgstr "Налаштувати"
 
 #: src/strings.ts:2201
-msgid "Configure server URLs for Notesnook"
-msgstr "Налаштувати URL-адреси серверів для Notesnook"
+msgid "Configure server URLs for Ryte"
+msgstr "Налаштувати URL-адреси серверів для Ryte"
 
 #: src/strings.ts:3001
 msgid "Confirm"
@@ -2856,8 +2856,8 @@ msgid "Do not worry about losing your data. Turn on automatic backups on weekly 
 msgstr "Не турбуйтеся про втрату даних. Увімкніть автоматичне резервне копіювання щотижня або щодня."
 
 #: src/strings.ts:246
-msgid "Do you enjoy using Notesnook?"
-msgstr "Вам подобається користуватися Notesnook?"
+msgid "Do you enjoy using Ryte?"
+msgstr "Вам подобається користуватися Ryte?"
 
 #: src/strings.ts:1164
 msgid "Documentation"
@@ -3325,8 +3325,8 @@ msgid "every 5 years"
 msgstr "кожні 5 років"
 
 #: src/strings.ts:3044
-msgid "Everything you do in Notesnook stays private. We use XChaCha20-Poly1305-IETF and Argon2 to encrypt your notes."
-msgstr "Усе, що ви робите в Notesnook, залишається приватним. Ми використовуємо XChaCha20-Poly1305-IETF та Argon2 для шифрування ваших нотаток."
+msgid "Everything you do in Ryte stays private. We use XChaCha20-Poly1305-IETF and Argon2 to encrypt your notes."
+msgstr "Усе, що ви робите в Ryte, залишається приватним. Ми використовуємо XChaCha20-Poly1305-IETF та Argon2 для шифрування ваших нотаток."
 
 #: src/strings.ts:2679
 msgid "Example"
@@ -3652,8 +3652,8 @@ msgid "File length mismatch. Expected {expectedSize} but got {currentSize} bytes
 msgstr "Невідповідність розміру файлу. Очікувалося {expectedSize}, отримано {currentSize} байт. Надішліть цей файл заново через менеджер вкладень."
 
 #: src/strings.ts:2549
-msgid "File links cannot be opened in browsers. Please use the Notesnook desktop app."
-msgstr "Посилання на файли не можна відкрити в браузері. Скористайтеся настільним застосунком Notesnook."
+msgid "File links cannot be opened in browsers. Please use the Ryte desktop app."
+msgstr "Посилання на файли не можна відкрити в браузері. Скористайтеся настільним застосунком Ryte."
 
 #: src/strings.ts:865
 msgid "File mismatch"
@@ -3720,16 +3720,16 @@ msgid "Follow us on Mastodon"
 msgstr "Стежте за нами в Mastodon"
 
 #: src/strings.ts:1178
-msgid "Follow us on Mastodon for updates and news about Notesnook"
-msgstr "Стежте за нами в Mastodon, щоб дізнаватися новини про Notesnook"
+msgid "Follow us on Mastodon for updates and news about Ryte"
+msgstr "Стежте за нами в Mastodon, щоб дізнаватися новини про Ryte"
 
 #: src/strings.ts:1179
 msgid "Follow us on X"
 msgstr "Стежте за нами в X"
 
 #: src/strings.ts:1180
-msgid "Follow us on X for updates and news about Notesnook"
-msgstr "Стежте за нами в X, щоб дізнаватися новини про Notesnook"
+msgid "Follow us on X for updates and news about Ryte"
+msgstr "Стежте за нами в X, щоб дізнаватися новини про Ryte"
 
 #: src/strings.ts:2073
 msgid "Font family"
@@ -3874,16 +3874,16 @@ msgid "Get helpful debug info about the app to help us find bugs."
 msgstr "Отримайте корисну інформацію для налагодження застосунку, щоб допомогти нам знайти помилки."
 
 #: src/strings.ts:1193
-msgid "Get Notesnook app on your desktop and access all notes"
-msgstr "Установіть застосунок Notesnook на комп'ютер і отримайте доступ до всіх нотаток"
+msgid "Get Ryte app on your desktop and access all notes"
+msgstr "Установіть застосунок Ryte на комп'ютер і отримайте доступ до всіх нотаток"
 
 #: src/strings.ts:1959
-msgid "Get Notesnook app on your iPhone and access all your notes on the go."
-msgstr "Установіть застосунок Notesnook на iPhone і отримайте доступ до всіх нотаток у дорозі."
+msgid "Get Ryte app on your iPhone and access all your notes on the go."
+msgstr "Установіть застосунок Ryte на iPhone і отримайте доступ до всіх нотаток у дорозі."
 
 #: src/strings.ts:1961
-msgid "Get Notesnook app on your iPhone or Android device and access all your notes on the go."
-msgstr "Установіть застосунок Notesnook на iPhone або пристрій Android і отримайте доступ до всіх нотаток у дорозі."
+msgid "Get Ryte app on your iPhone or Android device and access all your notes on the go."
+msgstr "Установіть застосунок Ryte на iPhone або пристрій Android і отримайте доступ до всіх нотаток у дорозі."
 
 #: src/strings.ts:512
 msgid "Get started"
@@ -4143,12 +4143,12 @@ msgid "If this continues to happen, please reach out to us via"
 msgstr "Якщо це не припиняється, зв'яжіться з нами через"
 
 #: src/strings.ts:1916
-msgid "If true, Notesnook will automatically start up when you turn on & login to your system."
-msgstr "Якщо увімкнено, Notesnook запускатиметься автоматично під час увімкнення системи та входу в неї."
+msgid "If true, Ryte will automatically start up when you turn on & login to your system."
+msgstr "Якщо увімкнено, Ryte запускатиметься автоматично під час увімкнення системи та входу в неї."
 
 #: src/strings.ts:1919
-msgid "If true, Notesnook will start minimized to either the system tray or your system taskbar/dock. This setting only works with Auto start on system startup is enabled."
-msgstr "Якщо увімкнено, Notesnook запускатиметься згорнутим у системний лоток або на панель завдань/док. Це налаштування працює лише за увімкненого «Автозапуск під час старту системи»."
+msgid "If true, Ryte will start minimized to either the system tray or your system taskbar/dock. This setting only works with Auto start on system startup is enabled."
+msgstr "Якщо увімкнено, Ryte запускатиметься згорнутим у системний лоток або на панель завдань/док. Це налаштування працює лише за увімкненого «Автозапуск під час старту системи»."
 
 #: src/strings.ts:1598
 msgid "If you can't scan the QR code above, enter this text instead (spaces don't matter)"
@@ -4432,8 +4432,8 @@ msgid "It seems that your changes could not be saved. What to do next:"
 msgstr "Схоже, ваші зміни не вдалося зберегти. Що робити далі:"
 
 #: src/strings.ts:248
-msgid "It took us a year to bring Notesnook to life. Share your experience and suggestions to help us improve it."
-msgstr "Нам знадобився рік, щоб створити Notesnook. Поділіться своїм досвідом і пропозиціями, щоб допомогти нам його покращити."
+msgid "It took us a year to bring Ryte to life. Share your experience and suggestions to help us improve it."
+msgstr "Нам знадобився рік, щоб створити Ryte. Поділіться своїм досвідом і пропозиціями, щоб допомогти нам його покращити."
 
 #: src/strings.ts:2054
 msgid "Italic"
@@ -4512,6 +4512,14 @@ msgstr "Минулі"
 msgid "Last edited at"
 msgstr "Останнє редагування"
 
+#: src/strings.ts:3284
+msgid "Last full backup: {date}"
+msgstr ""
+
+#: src/strings.ts:3285
+msgid "Last partial backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2469
 msgid "Last used on"
 msgstr "Останнє використання"
@@ -4545,8 +4553,8 @@ msgid "Learn more about Monographs"
 msgstr "Докладніше про монографії"
 
 #: src/strings.ts:245
-msgid "Learn more about Notesnook Monograph"
-msgstr "Докладніше про Notesnook Monograph"
+msgid "Learn more about Ryte Monograph"
+msgstr "Докладніше про Ryte Monograph"
 
 #: src/strings.ts:592
 msgid "Least relevant first"
@@ -4561,12 +4569,12 @@ msgid "Legal"
 msgstr "Правова інформація"
 
 #: src/strings.ts:428
-msgid "Let us know if you have faced any issue/bug while using Notesnook. We will try to fix it as soon as possible."
-msgstr "Повідомте нам, якщо ви натрапили на проблему чи помилку під час використання Notesnook. Ми спробуємо виправити її якнайшвидше."
+msgid "Let us know if you have faced any issue/bug while using Ryte. We will try to fix it as soon as possible."
+msgstr "Повідомте нам, якщо ви натрапили на проблему чи помилку під час використання Ryte. Ми спробуємо виправити її якнайшвидше."
 
 #: src/strings.ts:2832
-msgid "Let's look back at your year in Notesnook"
-msgstr "Згадаймо ваш рік у Notesnook"
+msgid "Let's look back at your year in Ryte"
+msgstr "Згадаймо ваш рік у Ryte"
 
 #: src/strings.ts:2763
 msgid "Level up with more storage."
@@ -5180,6 +5188,10 @@ msgstr "Нові нотатки будуть без категорії"
 msgid "Next"
 msgstr "Далі"
 
+#: src/strings.ts:3280
+msgid "Next full backup: {date}"
+msgstr ""
+
 #: src/strings.ts:2174
 msgid "Next match"
 msgstr "Наступний збіг"
@@ -5187,6 +5199,10 @@ msgstr "Наступний збіг"
 #: src/strings.ts:2857
 msgid "Next month"
 msgstr "Наступного місяця"
+
+#: src/strings.ts:3281
+msgid "Next partial backup: {date}"
+msgstr ""
 
 #: src/strings.ts:2220
 msgid "Next tab"
@@ -5412,57 +5428,9 @@ msgstr "Нотаток на місяць"
 msgid "notes this year"
 msgstr "нотаток цього року"
 
-#: src/strings.ts:2319
-msgid "Notesnook"
-msgstr "Notesnook"
-
-#: src/strings.ts:2380
-msgid "Notesnook Circle"
-msgstr "Notesnook Circle"
-
-#: src/strings.ts:2382
-msgid "Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
-msgstr "Notesnook Circle об'єднує надійних партнерів, які поділяють нашу відданість приватності, прозорості та свободі користувачів."
-
-#: src/strings.ts:2988
-msgid "Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website."
-msgstr "Notesnook виявив, що працює в режимі емуляції ARM64. Для максимальної продуктивності завантажте збірку ARM64 з нашого сайту."
-
 #: src/strings.ts:1945
 msgid "Notesnook Importer"
 msgstr "Notesnook Importer"
-
-#: src/strings.ts:3060
-msgid "Notesnook is available on all major platforms — for everyone."
-msgstr "Notesnook доступний на всіх основних платформах — для кожного."
-
-#: src/strings.ts:970
-msgid "Notesnook Pro"
-msgstr "Notesnook Pro"
-
-#: src/strings.ts:1974
-msgid ""
-"Notesnook uses the following DNS providers:\n"
-"\n"
-"1. Cloudflare DNS\n"
-"2. Quad9\n"
-"\n"
-"This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings."
-msgstr ""
-"Notesnook використовує таких DNS-провайдерів:\n"
-"\n"
-"1. Cloudflare DNS\n"
-"2. Quad9\n"
-"\n"
-"Це інколи дає змогу обійти локальні блокування трафіку Notesnook з боку провайдера. Вимкніть, якщо хочете, щоб застосунок використовував системні налаштування DNS."
-
-#: src/strings.ts:898
-msgid "Notesnook will send you a 2FA code on your email when prompted"
-msgstr "Notesnook надішле вам код 2FA на електронну пошту за запитом"
-
-#: src/strings.ts:905
-msgid "Notesnook will send you an SMS with a 2FA code when prompted"
-msgstr "Notesnook надішле вам SMS із кодом 2FA за запитом"
 
 #: src/strings.ts:3163
 msgid "NOTESNOOK WRAPPED {year}"
@@ -5597,8 +5565,8 @@ msgid "Open source"
 msgstr "Відкритий код"
 
 #: src/strings.ts:1189
-msgid "Open source libraries used in Notesnook"
-msgstr "Бібліотеки з відкритим кодом, що використовуються в Notesnook"
+msgid "Open source libraries used in Ryte"
+msgstr "Бібліотеки з відкритим кодом, що використовуються в Ryte"
 
 #: src/strings.ts:1188
 msgid "Open source licenses"
@@ -5750,8 +5718,8 @@ msgid "PDF is password protected"
 msgstr "PDF захищено паролем"
 
 #: src/strings.ts:3122
-msgid "Personalize & make Notesnook your own"
-msgstr "Персоналізуйте та налаштуйте Notesnook під себе"
+msgid "Personalize & make Ryte your own"
+msgstr "Персоналізуйте та налаштуйте Ryte під себе"
 
 #: src/strings.ts:1203
 msgid "Phone model"
@@ -6278,17 +6246,17 @@ msgstr "Вийти"
 msgid "Quote"
 msgstr "Цитата"
 
-#: src/strings.ts:1261
-msgid "Rate Notesnook on App Store"
-msgstr "Оцініть Notesnook в App Store"
-
-#: src/strings.ts:1262
-msgid "Rate Notesnook on Play Store"
-msgstr "Оцініть Notesnook у Play Store"
-
 #: src/strings.ts:536
 msgid "Rate now (It takes only a second)"
 msgstr "Оцінити зараз (це займе лише секунду)"
+
+#: src/strings.ts:1261
+msgid "Rate Ryte on App Store"
+msgstr "Оцініть Ryte в App Store"
+
+#: src/strings.ts:1262
+msgid "Rate Ryte on Play Store"
+msgstr "Оцініть Ryte у Play Store"
 
 #: src/strings.ts:344
 msgid "Read full release notes on Github"
@@ -6299,8 +6267,8 @@ msgid "Read only"
 msgstr "Лише для читання"
 
 #: src/strings.ts:1166
-msgid "Read the documentation to learn more about Notesnook"
-msgstr "Прочитайте документацію, щоб дізнатися більше про Notesnook"
+msgid "Read the documentation to learn more about Ryte"
+msgstr "Прочитайте документацію, щоб дізнатися більше про Ryte"
 
 #: src/strings.ts:1187
 msgid "Read the privacy policy"
@@ -6501,8 +6469,8 @@ msgid "Reminders"
 msgstr "Нагадування"
 
 #: src/strings.ts:1280
-msgid "Reminders cannot be set because notifications have been disabled from app settings. If you want to keep receiving reminder notifications, enable notifications for Notesnook from app settings."
-msgstr "Нагадування не можна встановити, оскільки сповіщення вимкнено в налаштуваннях застосунку. Якщо ви хочете й надалі отримувати сповіщення про нагадування, увімкніть сповіщення для Notesnook у налаштуваннях застосунку."
+msgid "Reminders cannot be set because notifications have been disabled from app settings. If you want to keep receiving reminder notifications, enable notifications for Ryte from app settings."
+msgstr "Нагадування не можна встановити, оскільки сповіщення вимкнено в налаштуваннях застосунку. Якщо ви хочете й надалі отримувати сповіщення про нагадування, увімкніть сповіщення для Ryte у налаштуваннях застосунку."
 
 #: src/strings.ts:1775
 msgid "Reminders will not be active on this device as it does not support notifications."
@@ -6793,6 +6761,54 @@ msgstr "Рядки"
 msgid "Run file check"
 msgstr "Запустити перевірку файлу"
 
+#: src/strings.ts:2319
+msgid "Ryte"
+msgstr "Ryte"
+
+#: src/strings.ts:2380
+msgid "Ryte Circle"
+msgstr "Ryte Circle"
+
+#: src/strings.ts:2382
+msgid "Ryte Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom."
+msgstr "Ryte Circle об'єднує надійних партнерів, які поділяють нашу відданість приватності, прозорості та свободі користувачів."
+
+#: src/strings.ts:2988
+msgid "Ryte detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Ryte from our website."
+msgstr "Ryte виявив, що працює в режимі емуляції ARM64. Для максимальної продуктивності завантажте збірку ARM64 з нашого сайту."
+
+#: src/strings.ts:3060
+msgid "Ryte is available on all major platforms — for everyone."
+msgstr "Ryte доступний на всіх основних платформах — для кожного."
+
+#: src/strings.ts:970
+msgid "Ryte Pro"
+msgstr "Ryte Pro"
+
+#: src/strings.ts:1974
+msgid ""
+"Ryte uses the following DNS providers:\n"
+"\n"
+"1. Cloudflare DNS\n"
+"2. Quad9\n"
+"\n"
+"This can sometimes bypass local ISP blockages on Ryte traffic. Disable this if you want the app to use system's DNS settings."
+msgstr ""
+"Ryte використовує таких DNS-провайдерів:\n"
+"\n"
+"1. Cloudflare DNS\n"
+"2. Quad9\n"
+"\n"
+"Це інколи дає змогу обійти локальні блокування трафіку Ryte з боку провайдера. Вимкніть, якщо хочете, щоб застосунок використовував системні налаштування DNS."
+
+#: src/strings.ts:898
+msgid "Ryte will send you a 2FA code on your email when prompted"
+msgstr "Ryte надішле вам код 2FA на електронну пошту за запитом"
+
+#: src/strings.ts:905
+msgid "Ryte will send you an SMS with a 2FA code when prompted"
+msgstr "Ryte надішле вам SMS із кодом 2FA за запитом"
+
 #: src/strings.ts:3085
 msgid "Safe publishing to the Internet"
 msgstr "Безпечна публікація в Інтернеті"
@@ -7058,8 +7074,8 @@ msgid "Security key successfully registered."
 msgstr "Ключ безпеки успішно зареєстровано."
 
 #: src/strings.ts:1195
-msgid "See what the future of Notesnook is going to be like."
-msgstr "Дізнайтеся, яким буде майбутнє Notesnook."
+msgid "See what the future of Ryte is going to be like."
+msgstr "Дізнайтеся, яким буде майбутнє Ryte."
 
 #: src/strings.ts:1233
 msgid "Select"
@@ -7110,8 +7126,8 @@ msgid "Select day of the week to repeat the reminder."
 msgstr "Виберіть день тижня для повторення нагадування."
 
 #: src/strings.ts:1487
-msgid "Select folder where Notesnook backup files are stored to view and restore them from the app"
-msgstr "Виберіть папку, у якій зберігаються файли резервних копій Notesnook, щоб переглядати та відновлювати їх із застосунку"
+msgid "Select folder where Ryte backup files are stored to view and restore them from the app"
+msgstr "Виберіть папку, у якій зберігаються файли резервних копій Ryte, щоб переглядати та відновлювати їх із застосунку"
 
 #: src/strings.ts:1488
 msgid "Select folder with backup files"
@@ -7162,8 +7178,8 @@ msgid "Select the languages the spell checker should check in."
 msgstr "Виберіть мови, які має перевіряти перевірка правопису."
 
 #: src/strings.ts:2235
-msgid "Select the release track for Notesnook."
-msgstr "Виберіть канал випусків для Notesnook."
+msgid "Select the release track for Ryte."
+msgstr "Виберіть канал випусків для Ryte."
 
 #: src/strings.ts:210
 msgid "SELECTED NOTE"
@@ -7400,12 +7416,12 @@ msgid "Share note"
 msgstr "Поділитися нотаткою"
 
 #: src/strings.ts:1646
-msgid "Share Notesnook with friends!"
-msgstr "Поділіться Notesnook із друзями!"
+msgid "Share Ryte with friends!"
+msgstr "Поділіться Ryte із друзями!"
 
 #: src/strings.ts:2424
-msgid "Share things to Notesnook from anywhere using the Inbox API"
-msgstr "Надсилайте матеріали до Notesnook звідусіль за допомогою API вхідних"
+msgid "Share things to Ryte from anywhere using the Inbox API"
+msgstr "Надсилайте матеріали до Ryte звідусіль за допомогою API вхідних"
 
 #: src/strings.ts:541
 msgid "Share to cloud"
@@ -7965,8 +7981,8 @@ msgid "Thank you for the purchase"
 msgstr "Дякуємо за покупку"
 
 #: src/strings.ts:431
-msgid "Thank you for updating Notesnook! We will be applying some minor changes for a better note taking experience."
-msgstr "Дякуємо, що оновили Notesnook! Ми внесемо невеликі зміни, щоб покращити роботу з нотатками."
+msgid "Thank you for updating Ryte! We will be applying some minor changes for a better note taking experience."
+msgstr "Дякуємо, що оновили Ryte! Ми внесемо невеликі зміни, щоб покращити роботу з нотатками."
 
 #: src/strings.ts:1867
 msgid "Thank you for your feedback!"
@@ -7993,12 +8009,12 @@ msgid "The API key allows you to access NN's inbox functionality."
 msgstr "Ключ API дозволяє отримати доступ до функцій вхідних повідомлень NN."
 
 #: src/strings.ts:661
-msgid "The default dark theme for the Notesnook app"
-msgstr "Темна тема за замовчуванням для програми Notesnook"
+msgid "The default dark theme for the Ryte app"
+msgstr "Темна тема за замовчуванням для програми Ryte"
 
 #: src/strings.ts:662
-msgid "The default light theme for Notesnook app."
-msgstr "Світла тема за замовчуванням для програми Notesnook."
+msgid "The default light theme for Ryte app."
+msgstr "Світла тема за замовчуванням для програми Ryte."
 
 #: src/strings.ts:2411
 msgid "The incoming note could not be unlocked with the provided password. Enter the correct password for the incoming note"
@@ -8011,10 +8027,6 @@ msgstr "Наведена вище інформація буде загально
 #: src/strings.ts:2809
 msgid "The note you are trying to append to has been deleted."
 msgstr "Нотатку, до якої ви намагаєтеся додати вміст, видалено."
-
-#: src/strings.ts:2386
-msgid "The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits."
-msgstr "Notesnook Circle доступний лише передплатникам. Розгляньте оформлення підписки, щоб отримати доступ до Notesnook Circle і додаткові переваги."
 
 #: src/strings.ts:2571
 msgid "The password for decrypting the Colornote backup file."
@@ -8047,6 +8059,10 @@ msgstr "Нагадування повторюватиметься щороку {
 #: src/strings.ts:1586
 msgid "The reminder will start on {date} at {time}."
 msgstr "Нагадування почнеться {date} о {time}."
+
+#: src/strings.ts:2386
+msgid "The Ryte Circle is exclusive to subscribers. Please consider subscribing to gain access to Ryte Circle and enjoy additional benefits."
+msgstr "Ryte Circle доступний лише передплатникам. Розгляньте оформлення підписки, щоб отримати доступ до Ryte Circle і додаткові переваги."
 
 #: src/strings.ts:1891
 msgid "The security key for unlocking the app. This is the most secure method."
@@ -8735,13 +8751,13 @@ msgstr "Не вдалося перевірити користувача"
 msgid "Using {instance} (v{version})"
 msgstr "Використовується {instance} (v{version})"
 
-#: src/strings.ts:2585
-msgid "Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
-msgstr "Використання Notesnook без облікового запису **НЕ** синхронізуватиме ваші нотатки між пристроями та може призвести до втрати даних, якщо ви втратите доступ до свого пристрою або видалите програму. Регулярно створюйте резервні копії своїх нотаток."
-
 #: src/strings.ts:2049
-msgid "Using official Notesnook instance"
-msgstr "Використовується офіційний екземпляр Notesnook"
+msgid "Using official Ryte instance"
+msgstr "Використовується офіційний екземпляр Ryte"
+
+#: src/strings.ts:2585
+msgid "Using Ryte without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly."
+msgstr "Використання Ryte без облікового запису **НЕ** синхронізуватиме ваші нотатки між пристроями та може призвести до втрати даних, якщо ви втратите доступ до свого пристрою або видалите програму. Регулярно створюйте резервні копії своїх нотаток."
 
 #: src/strings.ts:1583
 msgid "v{version} available"
@@ -8792,8 +8808,8 @@ msgid "Verify subscription"
 msgstr "Перевірити підписку"
 
 #: src/strings.ts:976
-msgid "Verify your subscription to Notesnook Pro"
-msgstr "Перевірте свою підписку Notesnook Pro"
+msgid "Verify your subscription to Ryte Pro"
+msgstr "Перевірте свою підписку Ryte Pro"
 
 #: src/strings.ts:1746
 msgid "Verifying 2FA code"
@@ -8969,12 +8985,12 @@ msgid "Welcome back!"
 msgstr "З поверненням!"
 
 #: src/strings.ts:2366
-msgid "Welcome to Notesnook {plan}"
-msgstr "Ласкаво просимо до Notesnook {plan}"
+msgid "Welcome to Ryte {plan}"
+msgstr "Ласкаво просимо до Ryte {plan}"
 
 #: src/strings.ts:3266
-msgid "Welcome to Notesnook Beta!"
-msgstr "Ласкаво просимо до Notesnook Beta!"
+msgid "Welcome to Ryte Beta!"
+msgstr "Ласкаво просимо до Ryte Beta!"
 
 #: src/strings.ts:3268
 msgid "Welcome to v{version}"
@@ -9078,8 +9094,8 @@ msgid "Yesterday, {time}"
 msgstr "Вчора, {time}"
 
 #: src/strings.ts:2863
-msgid "You already have a Notesnook subscription. You can change your plan from Settings > Subscription details."
-msgstr "У вас уже є підписка на Notesnook. Ви можете змінити свій план у Налаштування > Деталі підписки."
+msgid "You already have a Ryte subscription. You can change your plan from Settings > Subscription details."
+msgstr "У вас уже є підписка на Ryte. Ви можете змінити свій план у Налаштування > Деталі підписки."
 
 #: src/strings.ts:92
 msgid "You also agree to receive marketing emails from us which you can opt-out of from app settings."
@@ -9102,8 +9118,8 @@ msgid "You are editing #{tag}"
 msgstr "Ви редагуєте #{tag}"
 
 #: src/strings.ts:1640
-msgid "You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously."
-msgstr "Ви входите в бета-версію Notesnook. Перемикання між бета- &amp; стабільною версіями може спричинити дивні проблеми, включно з втратою даних. Радимо не використовувати обидві одночасно."
+msgid "You are logging into the beta version of Ryte. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously."
+msgstr "Ви входите в бета-версію Ryte. Перемикання між бета- &amp; стабільною версіями може спричинити дивні проблеми, включно з втратою даних. Радимо не використовувати обидві одночасно."
 
 #: src/strings.ts:1265
 msgid "You are not logged in"
@@ -9118,8 +9134,8 @@ msgid "You are on this plan."
 msgstr "Ви на цьому плані."
 
 #: src/strings.ts:3132
-msgid "You are one step away from unlocking the full potential of Notesnook."
-msgstr "Ви за крок від розкриття повного потенціалу Notesnook."
+msgid "You are one step away from unlocking the full potential of Ryte."
+msgstr "Ви за крок від розкриття повного потенціалу Ryte."
 
 #: src/strings.ts:809
 msgid "You are renaming color {color}"
@@ -9295,28 +9311,28 @@ msgid "You simply cannot get any better of a note taking app than @notesnook. Th
 msgstr "Просто не існує застосунку для нотаток кращого за @notesnook. Інтерфейс чистий і елегантний, він багатий на функції, зашифрований, розумно оцінений (особливо для студентів і викладачів) та з відкритим кодом"
 
 #: src/strings.ts:972
-msgid "You subscribed to Notesnook Pro on {date}. Verify this subscription?"
-msgstr "Ви оформили підписку Notesnook Pro {date}. Перевірити цю підписку?"
+msgid "You subscribed to Ryte Pro on {date}. Verify this subscription?"
+msgstr "Ви оформили підписку Ryte Pro {date}. Перевірити цю підписку?"
 
 #: src/strings.ts:644
-msgid "You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase."
-msgstr "Ви оформили підписку Notesnook Pro на телефоні/планшеті Android через вбудовану покупку Google."
+msgid "You subscribed to Ryte Pro on Android Phone/Tablet using Google In App Purchase."
+msgstr "Ви оформили підписку Ryte Pro на телефоні/планшеті Android через вбудовану покупку Google."
 
 #: src/strings.ts:639
-msgid "You subscribed to Notesnook Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings."
-msgstr "Ви оформили підписку Notesnook Pro на iOS через вбудовану покупку Apple. Скасувати її можна будь-коли в налаштуваннях вашого облікового запису iTunes."
+msgid "You subscribed to Ryte Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings."
+msgstr "Ви оформили підписку Ryte Pro на iOS через вбудовану покупку Apple. Скасувати її можна будь-коли в налаштуваннях вашого облікового запису iTunes."
 
 #: src/strings.ts:648
-msgid "You subscribed to Notesnook Pro on the Web/Desktop App."
-msgstr "Ви оформили підписку Notesnook Pro через веб- або настільний застосунок."
+msgid "You subscribed to Ryte Pro on the Web/Desktop App."
+msgstr "Ви оформили підписку Ryte Pro через веб- або настільний застосунок."
 
 #: src/strings.ts:652
-msgid "You subscribed to Notesnook Pro using a gift card."
-msgstr "Ви оформили підписку Notesnook Pro за допомогою подарункової картки."
+msgid "You subscribed to Ryte Pro using a gift card."
+msgstr "Ви оформили підписку Ryte Pro за допомогою подарункової картки."
 
 #: src/strings.ts:634
-msgid "You were awarded a subscription to Notesnook Pro by Streetwriters."
-msgstr "Streetwriters надала вам підписку Notesnook Pro."
+msgid "You were awarded a subscription to Ryte Pro by Streetwriters."
+msgstr "Streetwriters надала вам підписку Ryte Pro."
 
 #: src/strings.ts:420
 msgid "You will be logged out from all your devices"
@@ -9484,8 +9500,8 @@ msgid "Your plan will be switched to {plan} plan. You will receive a credit for 
 msgstr "Ваш план буде змінено на план «{plan}». Ви отримаєте кредит за невикористаний час попередньої підписки і сплатите лише пропорційну суму за нову підписку."
 
 #: src/strings.ts:757
-msgid "Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again."
-msgstr "Ваша приватність важлива для нас, ким би ви не були. У світі, де всі намагаються за вами стежити, Notesnook шифрує всі ваші дані до того, як вони залишать ваш пристрій. З Notesnook ніхто більше не зможе продати ваші дані."
+msgid "Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Ryte encrypts all your data before it leaves your device. With Ryte no one can ever sell your data again."
+msgstr "Ваша приватність важлива для нас, ким би ви не були. У світі, де всі намагаються за вами стежити, Ryte шифрує всі ваші дані до того, як вони залишать ваш пристрій. З Ryte ніхто більше не зможе продати ваші дані."
 
 #: src/strings.ts:1208
 msgid "Your profile pictrure is stored 100% end-to-end encrypted and only visible to you."

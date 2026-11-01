@@ -278,12 +278,13 @@ class UserManager {
     return true;
   }
 
-  async logout(revoke = true, reason?: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async logout(_revoke = true, reason?: string) {
     try {
+      // Ryte: nothing to revoke; the cloud drive session is forgotten by the app
       await this.db.syncer.devices.unregister();
-      if (revoke) await this.tokenManager.revokeToken();
     } catch (e) {
-      logger.error(e, "Error logging out user.", { revoke, reason });
+      logger.error(e, "Error logging out user.", { reason });
     } finally {
       this.keyManager.clearCache();
       await this.db.reset();
@@ -358,13 +359,10 @@ class UserManager {
    * @param revision revision at which the master key that wrapped the keys
    * was set
    */
-  private async addUserKeys(keys: UserKeys, revision?: number): Promise<User> {
-    const token = await this.tokenManager.getAccessToken();
-    return await http.post.json(
-      `${constants.API_HOST}${ENDPOINTS.userKeys}${revisionQuery(revision)}`,
-      keys,
-      token
-    );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private async addUserKeys(keys: UserKeys, _revision?: number): Promise<User> {
+    // Ryte: keys live in account.json in the user's cloud drive
+    return await this.db.ryte.addKeys(keys);
   }
 
   private async getRemoteUser(): Promise<User | undefined> {
@@ -413,42 +411,15 @@ class UserManager {
 
   async fetchUser(): Promise<User | undefined> {
     this.keyManager.clearCache();
-
-    const oldUser = await this.getUser();
+    // Ryte: the "account" is account.json in the user's cloud drive
     try {
-      const token = await this.tokenManager.getAccessToken();
-      if (!token) return;
-      const fetchedUser: User | undefined = await http.get(
-        `${constants.API_HOST}${ENDPOINTS.user}`,
-        token
-      );
-      if (!fetchedUser) return oldUser;
-
-      await this.setUser(fetchedUser);
-      // keeps a newer stored user, e.g. from a password change
-      const user = await this.getUser();
-      // only missing if the user logged out while the request was in flight
+      const user = await this.db.ryte.refresh();
       if (!user) return;
-
-      if (
-        oldUser &&
-        (oldUser.subscription.plan !== user.subscription.plan ||
-          oldUser.subscription.status !== user.subscription.status ||
-          oldUser.subscription.provider !== user.subscription.provider)
-      ) {
-        await this.tokenManager._refreshToken(true);
-        this.db.eventManager.publish(
-          EVENTS.userSubscriptionUpdated,
-          user.subscription
-        );
-      }
-      if (oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed)
-        this.db.eventManager.publish(EVENTS.userEmailConfirmed);
       this.db.eventManager.publish(EVENTS.userFetched, user);
       return user;
     } catch (e) {
       logger.error(e, "Error fetching user");
-      return await this.getUser().catch(() => oldUser);
+      return await this.getUser();
     }
   }
 

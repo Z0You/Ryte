@@ -86,11 +86,8 @@ async function loadProductsAndSubs() {
 }
 
 function get() {
-  // if (__DEV__ || Config.isTesting === "true") return true;
-  return (
-    useUserStore.getState().user?.subscription?.plan !== undefined &&
-    useUserStore.getState().user?.subscription?.plan !== SubscriptionPlan.FREE
-  );
+  // Ryte: all features are available to everyone.
+  return true;
 }
 
 const showVerifyEmailDialog = () => {

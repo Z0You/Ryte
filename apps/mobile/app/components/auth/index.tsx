@@ -17,20 +17,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import React, { useState } from "react";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigationFocus } from "../../hooks/use-navigation-focus";
 import { Toast } from "../toast";
 import { AuthMode, initialAuthMode } from "./common";
-import { Login } from "./login";
-import { Signup } from "./signup";
 import { useThemeColors } from "@notesnook/theme";
 import { NavigationProps } from "../../services/navigation";
+import { RyteConnect } from "../../ryte/ryte-connect";
+import { db } from "../../common/database";
+import PremiumService from "../../services/premium";
+import SettingsService from "../../services/settings";
+import Sync from "../../services/sync";
+import { eSendEvent } from "../../services/event-manager";
+import { useUserStore } from "../../stores/use-user-store";
+import { eUserLoggedIn } from "../../utils/events";
+import { sleep } from "../../utils/time";
+import { hideAuth } from "./common";
 
 const Auth = ({ navigation, route }: NavigationProps<"Auth">) => {
-  const [currentAuthMode, setCurrentAuthMode] = useState(
-    route?.params?.mode || AuthMode.login
-  );
   const { colors } = useThemeColors();
   initialAuthMode.current = route?.params.mode || AuthMode.login;
   useNavigationFocus(navigation, {});
@@ -39,15 +44,26 @@ const Auth = ({ navigation, route }: NavigationProps<"Auth">) => {
     <SafeAreaView
       style={{ flex: 1, backgroundColor: colors.primary.background }}
     >
-      {currentAuthMode !== AuthMode.login &&
-      currentAuthMode !== AuthMode.welcomeLogin ? (
-        <Signup
-          changeMode={(mode) => setCurrentAuthMode(mode)}
-          welcome={initialAuthMode.current === AuthMode.welcomeSignup}
-        />
-      ) : (
-        <Login changeMode={(mode) => setCurrentAuthMode(mode)} />
-      )}
+      {/* Ryte: no Notesnook accounts; sign-in = connect MEGA / Filen */}
+      <RyteConnect
+        onDone={async () => {
+          const user = await db.user.getUser();
+          if (user) useUserStore.getState().setUser(user);
+          PremiumService.setPremiumStatus();
+          SettingsService.set({
+            sessionExpired: false,
+            userEmailConfirmed: true
+          });
+          eSendEvent(eUserLoggedIn, true);
+          await sleep(300);
+          hideAuth(route?.params?.context);
+          setTimeout(() => {
+            if (!useUserStore.getState().syncing) {
+              Sync.run("global", false, "full");
+            }
+          }, 1000);
+        }}
+      />
 
       <Toast context="local" />
     </SafeAreaView>

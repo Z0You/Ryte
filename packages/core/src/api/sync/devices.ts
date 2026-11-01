@@ -18,8 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import { KVStorageAccessor } from "../../interfaces.js";
-import hosts from "../../utils/constants.js";
-import http from "../../utils/http.js";
 import { getId } from "../../utils/id.js";
 import TokenManager from "../token-manager.js";
 
@@ -29,21 +27,15 @@ export class SyncDevices {
     private readonly tokenManager: TokenManager
   ) {}
 
+  // Ryte: devices only need an id of their own, used to name their sync
+  // logs in the cloud folder. Nothing is registered anywhere.
   async register() {
     const deviceId = getId();
-    const url = `${hosts.API_HOST}/devices?deviceId=${deviceId}`;
-    const token = await this.tokenManager.getAccessToken();
-    return http
-      .post(url, null, token)
-      .then(() => this.kv().write("deviceId", deviceId));
+    await this.kv().write("deviceId", deviceId);
   }
 
   async unregister() {
-    const deviceId = await this.kv().read("deviceId");
-    if (!deviceId) return;
-    const url = `${hosts.API_HOST}/devices?deviceId=${deviceId}`;
-    const token = await this.tokenManager.getAccessToken();
-    return http.delete(url, token).then(() => this.kv().delete("deviceId"));
+    await this.kv().delete("deviceId");
   }
 
   get() {

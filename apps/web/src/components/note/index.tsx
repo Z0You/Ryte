@@ -467,6 +467,8 @@ export const noteMenuItems: (
     {
       type: "button",
       key: "publish",
+      // Ryte: publishing needs Notesnook's servers
+      isHidden: true,
       isDisabled: !db.monographs.isPublished(note.id) && context?.locked,
       icon: Publish.path,
       title: strings.publish(),

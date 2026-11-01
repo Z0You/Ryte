@@ -135,7 +135,7 @@ android {
     }
     namespace "com.streetwriters.notesnook"
     defaultConfig {
-        applicationId "com.streetwriters.notesnook"
+        applicationId "com.z0you.ryte"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
@@ -166,10 +166,21 @@ android {
             keyPassword 'android'
         }
           release {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            // Ryte: sign with your own key when RYTE_KEYSTORE_FILE is set
+            // (see .github/workflows/ryte-android.yml), otherwise with the
+            // keystore in this folder
+            def ryteKeystore = System.getenv("RYTE_KEYSTORE_FILE")
+            if (ryteKeystore) {
+                storeFile file(ryteKeystore)
+                storePassword System.getenv("RYTE_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("RYTE_KEY_ALIAS")
+                keyPassword System.getenv("RYTE_KEY_PASSWORD")
+            } else {
+                storeFile file('debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
         }
     }
     buildTypes {

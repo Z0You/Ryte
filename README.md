@@ -1,71 +1,68 @@
-<p align="center">
-<img style="align:center;" src="./resources/icon.png" alt="Notesnook Logo" width="100" />
-</p>
+<p align="center"><img src="resources/ryte/icon.svg" width="96" alt="Ryte logo"></p>
 
-<h1 align="center">Notesnook</h1>
-<h3 align="center">An end-to-end encrypted note taking alternative to Evernote.</h3>
-<p align="center">
-<a href="https://notesnook.com/">Website</a> | <a href="https://notesnook.com/about">About us</a> | <a href="https://notesnook.com/roadmap">Roadmap</a> | <a href="https://notesnook.com/downloads">Downloads</a> | <a href="https://twitter.com/@notesnook">Twitter</a> | <a href="https://discord.gg/5davZnhw3V">Discord</a>
-</p>
+# Ryte
 
-## Overview
+Ryte is an end-to-end encrypted notes app for **Android** and the **web**, with
+every feature included and no upload limits. It is a fork of
+[Notesnook](https://github.com/streetwriters/notesnook) 3.4.15: the same
+editor, notebooks, tags, reminders, vault, app lock, note history and
+attachments, but instead of Notesnook's servers and paid plans, Ryte keeps
+your data in **your own MEGA or Filen account**.
 
-Notesnook is a free (as in speech) & open-source note-taking app focused on user privacy & ease of use. To ensure zero knowledge principles, Notesnook encrypts everything on your device using `XChaCha20-Poly1305` & `Argon2`.
+## How it works
 
-Notesnook is our **proof** that privacy does _not_ (always) have to come at the cost of convenience. We aim to provide users peace of mind & 100% confidence that their notes are safe and secure. The decision to go fully open source is one of the most crucial steps towards that.
+- **Sign in** = connect MEGA or Filen, then choose an *encryption password*.
+  Other devices sign in to the same MEGA/Filen account and enter the same
+  encryption password.
+- Everything is encrypted on the device (XChaCha20-Poly1305, key derived with
+  Argon2 from the encryption password) before it is uploaded. MEGA and Filen
+  only ever see ciphertext.
+- Your drive gets two folders:
+  - `Ryte/`: `account.json` (salt, a key check and wrapped keys; nothing
+    readable) and each device's sync log (`log-<device>-<n>.json`). When many
+    logs pile up, a device folds them into a snapshot (`snap-…json`).
+  - `Ryte Files/`: encrypted attachments, one file per attachment.
+- **No plan limits**: all features are unlocked for everyone. Storage is
+  limited only by the free space of your MEGA/Filen account (check each
+  service's current free plan).
+- The encryption password **cannot be recovered**. If you forget it, the synced
+  notes cannot be decrypted. Keep a backup (Settings → Backup & export).
 
-This repository contains all the code required to build & use the Notesnook web, desktop & mobile clients. If you are looking for a full feature list or screenshots, please check the [website](https://notesnook.com/).
+## Not available in Ryte
 
-## Developer guide
+These need Notesnook's own servers, so they are hidden: publishing notes to
+the web (Monographs), the Inbox API, Notesnook Circle, 2FA/email/password
+management of a Notesnook account, and account recovery.
 
-### Technologies & languages
+## Downloads
 
-Notesnook is built using the following technologies:
+- **Android**: every push to `main` builds an APK and publishes it under
+  [Releases](../../releases). Use the `arm64` APK on most phones.
+- **Web**: every push to `main` builds the static site (artifact `ryte-web`).
+  Host it on any static host at the root of a (sub)domain, or set the
+  Cloudflare secrets described in `.github/workflows/ryte-web.yml`.
 
-1. JavaScript/Typescript — this repo is in a hybrid state. A lot of the newer code is being written in Typescript & the old code is slowly being ported over.
-2. React — the whole front-end across all platforms is built using React.
-3. React Native — For mobile apps we are using React Native
-4. Electron — For desktop app
-5. NPM — listed here because we **don't** use Yarn or PNPM or XYZ across any of our projects.
+## Development
 
-> **Note: Each project in the monorepo contains its own architecture details which you can refer to.**
+```sh
+npm ci --ignore-scripts
+npm run bootstrap -- --scope=web     # or --scope=mobile
+npm run start:web                    # http://localhost:3000
+```
 
-### Monorepo structure
+- Ryte's code lives in `packages/ryte-cloud` (MEGA/Filen adapters, Android
+  bridge), `packages/core/src/api/ryte` (account + cloud sync),
+  `apps/web/src/ryte` and `apps/mobile/app/ryte`. Other changes to Notesnook
+  code are marked with `Ryte:` comments.
+- Android runs MEGA/Filen in a hidden WebView (React Native has no
+  WebCrypto). Rebuild that page after changing `packages/ryte-cloud`:
+  `npm ci --prefix packages/ryte-cloud && node packages/ryte-cloud/scripts/build-bridge.mjs`
+- Logo: `resources/ryte/*.svg`; render all icons with
+  `node resources/ryte/render-icons.js`.
 
-| Name                       | Path                                               | Description                                                          |
-| -------------------------- | -------------------------------------------------- | -------------------------------------------------------------------- |
-| `@notesnook/web`           | [/apps/web](/apps/web)                             | Web client                                                           |
-| `@notesnook/desktop`       | [/apps/desktop](/apps/desktop)                     | Desktop client                                                       |
-| `@notesnook/mobile`        | [/apps/mobile](/apps/mobile)                       | Android/iOS clients                                                  |
-| `@notesnook/web-clipper`   | [/extensions/web-clipper](/extensions/web-clipper) | Web clipper                                                          |
-| `@notesnook/core`          | [/packages/core](/packages/core)                   | Shared core between all platforms                                    |
-| `@notesnook/crypto`        | [/packages/crypto](/packages/crypto)               | Cryptography library wrapper around libsodium                        |
-| `@notesnook/clipper`       | [/packages/clipper](/packages/clipper)             | Web clipper core handling everything related to actual page clipping |
-| `@notesnook/editor`        | [/packages/editor](/packages/editor)               | Notesnook editor + all extensions                                    |
-| `@notesnook/editor-mobile` | [/packages/editor-mobile](/packages/editor-mobile) | A very thin wrapper around `@notesnook/editor` for mobile clients    |
-| `@notesnook/logger`        | [/packages/logger](/packages/logger)               | Simple & pluggable logger                                            |
-| `@notesnook/sodium`        | [/packages/sodium](/packages/sodium)               | Wrapper around libsodium to support Node.js & Browser                |
-| `@notesnook/streamable-fs` | [/packages/streamable-fs](/packages/streamable-fs) | Streaming interface around an IndexedDB based file system            |
-| `@notesnook/theme`         | [/packages/theme](/packages/theme)                 | The core theme used in web & desktop clients                         |
+## License
 
-### Contributing guidelines
-
-If you are interested in contributing to Notesnook, I highly recommend checking out the [contributing guidelines](/CONTRIBUTING.md). You'll find all the relevant information such as [style guideline](/CONTRIBUTING.md#style-guidelines), [how to make a PR](/CONTRIBUTING.md#opening--submitting-a-pull-request), [how to commit](/CONTRIBUTING.md#commit-guidelines) etc., there.
-
-### Support & help
-
-You can reach out to us via:
-
-1. [Email](mailto:support@streetwriters.co)
-2. [Discord](https://discord.gg/5davZnhw3V)
-3. [Twitter](https://twitter.com/notesnook)
-4. [Create an issue](https://github.com/streetwriters/notesnook/issues/new)
-
-We take all queries, issues and bug reports that you might have. Feel free to ask.
-
-## Additional Resources
-
-- [Migrating & Importing your data from other apps — Importer](https://notesnook.com/help/importing-notes)
-- [Privacy policy](https://notesnook.com/privacy) & [Terms of service](https://notesnook.com/terms)
-- [Verify Notesnook encryption claims yourself — Vericrypt](https://vericrypt.notesnook.com/)
-- [Why Notesnook requires an email address?](https://blog.notesnook.com/why-notesnook-requires-an-email-address/)
+GPL-3.0-or-later, like Notesnook. Ryte is based on Notesnook by Streetwriters
+(Private) Limited; see `NOTESNOOK-README.md` for the original README. The
+bundled Filen SDK (`packages/ryte-cloud/vendor/filen-sdk`) is AGPL-3.0;
+megajs is MIT. Ryte is not affiliated with Notesnook, MEGA or Filen.

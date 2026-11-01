@@ -1147,6 +1147,8 @@ export const useActions = ({
       },
       {
         id: "publish",
+        // Ryte: publishing needs Notesnook's servers
+        hidden: true,
         title: isPublished ? strings.published() : strings.publish(),
         icon: "cloud-upload-outline",
         checked: isPublished,

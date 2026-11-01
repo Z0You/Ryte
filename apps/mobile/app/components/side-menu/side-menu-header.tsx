@@ -102,7 +102,7 @@ export const SideMenuHeader = (props: { rightButtons?: IconButtonProps[] }) => {
           <SvgView width={28} height={28} src={NOTESNOOK_LOGO_SVG} />
         </View>
 
-        <Heading size={AppFontSize.lg}>Notesnook</Heading>
+        <Heading size={AppFontSize.lg}>Ryte</Heading>
       </View>
 
       <View

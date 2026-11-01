@@ -27,6 +27,7 @@ import { deriveKey, useKeyStore } from "../interfaces/key-store";
 import { hosts, SubscriptionPlan, SubscriptionStatus } from "@notesnook/core";
 import Config from "../utils/config";
 import { FileStorage } from "../interfaces/fs";
+import { ryteCloud } from "../ryte/cloud";
 
 function getHostUrl(hostUrl: keyof typeof hosts, defaultUrl: string) {
   if (IS_TESTING) return defaultUrl;
@@ -35,6 +36,7 @@ function getHostUrl(hostUrl: keyof typeof hosts, defaultUrl: string) {
 }
 
 const db = database;
+if (IS_TESTING) (globalThis as Record<string, unknown>).__ryteDb = db;
 async function initializeDatabase(persistence: DatabasePersistence) {
   performance.mark("start:initializeDatabase");
 
@@ -101,7 +103,8 @@ async function initializeDatabase(persistence: DatabasePersistence) {
       const limit = await getFeatureLimit(getFeature("maxNoteVersions"));
       return typeof limit.caption === "number" ? limit.caption : undefined;
     },
-    batchSize: 100
+    batchSize: 100,
+    cloud: async () => ryteCloud.drive()
   });
 
   // if (IS_TESTING) {

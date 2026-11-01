@@ -29,6 +29,7 @@ import {
 import Navigation from "../../services/navigation";
 import BackupService from "../../services/backup";
 import { useUserStore } from "../../stores/use-user-store";
+import { RyteCloud } from "../../ryte/bridge";
 
 export async function logoutUser() {
   const hasUnsyncedChanges = await db.hasUnsyncedChanges();
@@ -101,6 +102,8 @@ export async function logoutUser() {
           });
 
           await db.user?.logout();
+          // Ryte: also forget the MEGA / Filen session on this device
+          await RyteCloud.disconnect().catch(() => undefined);
           endProgress();
         } catch (e) {
           DatabaseLogger.error(e);

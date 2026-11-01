@@ -66,17 +66,7 @@ export const MenuItemsList: SideMenuItem[] = [
     icon: "bell",
     type: "side-menu-item"
   },
-  {
-    dataType: "monograph",
-    id: "Monographs",
-    title: "Monographs",
-    icon: "text-box-multiple-outline",
-    onPress: () => {
-      Navigation.closeDrawer();
-      Monographs.navigate();
-    },
-    type: "side-menu-item"
-  },
+  // Ryte: "Monographs" (notes published on the web) needs Notesnook's servers
   {
     dataType: "note",
     id: "Archive",

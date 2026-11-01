@@ -85,6 +85,8 @@ import { LazyPromise } from "../utils/lazy-promise.js";
 import { InboxApiKeys } from "./inbox-api-keys.js";
 import { Circle } from "./circle.js";
 import { Wrapped } from "./wrapped.js";
+import { RyteAccount } from "./ryte/account.js";
+import type { CloudDriveAccessor } from "./ryte/drive.js";
 
 type EventSourceConstructor = new (
   uri: string,
@@ -98,6 +100,8 @@ type Options = {
   compressor: () => Promise<ICompressor>;
   maxNoteVersions: () => Promise<number | undefined>;
   batchSize: number;
+  /** Ryte: the user's connected cloud drive (MEGA / Filen), if any. */
+  cloud?: CloudDriveAccessor;
 };
 
 // const DIFFERENCE_THRESHOLD = 20 * 1000;
@@ -205,6 +209,7 @@ class Database {
   pricing = Pricing;
 
   user = new UserManager(this);
+  ryte = new RyteAccount(this);
   syncer = new Sync(this);
   vault = new Vault(this);
   lookup = new Lookup(this);

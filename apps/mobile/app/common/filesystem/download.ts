@@ -25,7 +25,8 @@ import { ToastManager } from "../../services/event-manager";
 import { useAttachmentStore } from "../../stores/use-attachment-store";
 import { DatabaseLogger, db } from "../database";
 import { createCacheDir, exists } from "./io";
-import { ABYTES, cacheDir, getUploadedFileSize, parseS3Error } from "./utils";
+import { ABYTES, cacheDir, getUploadedFileSize } from "./utils";
+import { RyteFiles } from "../../ryte/bridge";
 
 export async function downloadFile(
   filename: string,
@@ -44,7 +45,7 @@ export async function downloadFile(
   DatabaseLogger.log(`Downloading ${filename}`);
   await createCacheDir();
 
-  const { url, headers, chunkSize } = requestOptions;
+  const { url, chunkSize } = requestOptions;
   const tempFilePath = `${cacheDir}/${filename}_temp`;
   const originalFilePath = `${cacheDir}/${filename}`;
 
@@ -82,71 +83,32 @@ export async function downloadFile(
       throw new Error(error);
     }
 
-    const resolveUrlResponse = await fetch(url, {
-      method: "GET",
-      headers
-    });
-
-    if (!resolveUrlResponse.ok) {
-      DatabaseLogger.log(
-        `Error downloading file: ${filename}, ${resolveUrlResponse.status}, ${resolveUrlResponse.statusText}, reason: Unable to resolve download url`
-      );
-      throw new Error(
-        `${resolveUrlResponse.status}: ${strings.failedToResolvedDownloadUrl()}`
-      );
-    }
-
-    const downloadUrl = await resolveUrlResponse.text();
-
-    if (!downloadUrl) {
-      DatabaseLogger.log(
-        `Error downloading file: ${filename}, reason: Unable to resolve download url`
-      );
-      throw new Error(strings.failedToResolvedDownloadUrl());
-    }
-
+    // Ryte: download from the "Ryte Files" folder of the user's drive,
+    // through the cloud bridge, in 1 MB pieces appended to the temp file
     DatabaseLogger.log(`Download starting: ${filename}`);
-    const request = RNFetchBlob.config({
-      path: tempFilePath,
-      IOSBackgroundTask: true,
-      overwrite: true
-    })
-      .fetch("GET", downloadUrl)
-      .progress(async (recieved, total) => {
-        useAttachmentStore
-          .getState()
-          .setProgress(
-            0,
-            parseInt(total),
-            filename,
-            parseInt(recieved),
-            "download"
-          );
-
-        DatabaseLogger.log(`Downloading: ${filename}, ${recieved}/${total}`);
-      });
-
+    let canceled = false;
     cancelToken.cancel = async (reason) => {
+      canceled = true;
       useAttachmentStore.getState().remove(filename);
-      request.cancel();
-      RNFetchBlob.fs.unlink(tempFilePath).catch(() => {
-        /* empty */
-      });
       DatabaseLogger.log(`Download cancelled: ${reason} ${filename}`);
     };
+    await RNFetchBlob.fs.writeFile(tempFilePath, "", "utf8");
+    const downloaded = await RyteFiles.download(
+      filename,
+      async (piece) => {
+        if (canceled) throw new Error("canceled");
+        await RNFetchBlob.fs.appendFile(tempFilePath, piece, "base64");
+      },
+      (loaded, total) =>
+        useAttachmentStore
+          .getState()
+          .setProgress(0, total, filename, loaded, "download")
+    );
+    if (downloaded === undefined)
+      throw new Error(
+        `This attachment was not found in your cloud storage. (File hash: ${filename})`
+      );
 
-    const response = await request;
-
-    const contentType =
-      response.info().headers?.["content-type"] ||
-      response.info().headers?.["Content-Type"];
-
-    if (contentType === "application/xml") {
-      const error = parseS3Error(await response.text());
-      throw new Error(`[${error.Code}] ${error.Message}`);
-    }
-
-    const status = response.info().status;
     useAttachmentStore.getState().remove(filename);
 
     if (await exists(originalFilePath)) {
@@ -163,7 +125,7 @@ export async function downloadFile(
       throw new Error("File size mismatch");
     }
 
-    return status >= 200 && status < 300;
+    return true;
   } catch (e) {
     if (
       (e as Error).message !== "canceled" &&

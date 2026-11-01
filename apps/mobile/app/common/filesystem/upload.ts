@@ -31,137 +31,49 @@ import {
   FileSizeResult,
   getUploadedFileSize
 } from "./utils";
-import Upload from "@ammarahmed/react-native-upload";
-import { CloudUploader } from "react-native-nitro-cloud-uploader";
 import { useUserStore } from "../../stores/use-user-store";
 import { sleep } from "../../utils/time";
 import { isFeatureAvailable } from "@notesnook/common";
 import { strings } from "@notesnook/intl";
+import { PIECE_SIZE, RyteFiles } from "../../ryte/bridge";
 
-// Upload constants
-const CHUNK_SIZE = 10 * 1024 * 1024; // 10 MB
-const MINIMUM_MULTIPART_FILE_SIZE = 25 * 1024 * 1024; // 25MB
-
-interface InitiateMultipartResponse {
-  uploadId: string;
-  parts: string[];
-  error?: string;
-}
-
-async function initiateMultipartUpload(
-  filename: string,
-  fileSize: number,
-  headers: Record<string, string>
-): Promise<InitiateMultipartResponse> {
-  const totalParts = Math.ceil(fileSize / CHUNK_SIZE);
-
-  const url = `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${totalParts}&uploadId=`;
-  const response = await fetch(url, { headers });
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to initiate multipart upload: ${response.statusText}`
-    );
-  }
-
-  const data = await response.json();
-
-  if (data.error) {
-    throw new Error(data.error);
-  }
-
-  if (!data.uploadId || !data.parts) {
-    throw new Error("Failed to initiate multipart upload: invalid response.");
-  }
-
-  DatabaseLogger.info(
-    `Initiated multipart upload for ${filename} with upload ID: ${data.uploadId}`
-  );
-
-  return data;
-}
-
-async function multipartUploadFile(
-  filename: string,
-  filePath: string,
-  fileSize: number,
-  requestOptions: RequestOptions,
-  cancelToken: { cancel: (reason?: string) => Promise<void> }
-): Promise<Response> {
-  const { headers } = requestOptions;
-
-  try {
-    const uploadData = await initiateMultipartUpload(
-      filename,
-      fileSize,
-      headers
-    );
-    const { uploadId, parts } = uploadData;
-
-    DatabaseLogger.info(
-      `Starting upload for ${filename} with ${parts.length} parts`
-    );
-
-    cancelToken.cancel = async () => {
-      useAttachmentStore.getState().remove(filename);
-      await CloudUploader.cancelUpload(uploadId);
-    };
-
-    CloudUploader.addListener("upload-progress", (event) => {
-      useAttachmentStore
-        .getState()
-        .setProgress(
-          event.bytesUploaded || 0,
-          event.totalBytes || fileSize,
-          filename,
-          0,
-          "upload"
-        );
-      DatabaseLogger.info(
-        `File upload progress: ${filename}, ${event.bytesUploaded}/${
-          event.totalBytes || fileSize
-        }, chunk: ${event.chunkIndex}, progress: ${event.progress}`
-      );
-    });
-    // CloudUploader handles chunking and uploading all parts internally
-    const result = await CloudUploader.startUpload(
-      filename,
-      filePath,
-      parts,
-      3, // maxParallel
-      true // showNotification
-    );
-
-    CloudUploader.removeListener("upload-progress");
-
-    if (!result.success) {
-      throw new Error("Failed to upload multipart file");
-    }
-
-    DatabaseLogger.info(
-      `Multipart upload completed for ${filename} with upload ID: ${uploadId}`
-    );
-
-    const response = await fetch(`${hosts.API_HOST}/s3/multipart`, {
-      method: "POST",
-      body: JSON.stringify({
-        Key: filename,
-        UploadId: uploadId,
-        PartETags: result.etags.map((etag, index) => ({
-          partNumber: index + 1,
-          etag: etag
-        }))
-      }),
-      headers: { ...headers, "Content-Type": "application/json" }
-    });
-
-    return response;
-  } catch (error) {
-    DatabaseLogger.error(error, "Multipart upload failed", { filename });
-    CloudUploader.removeListener("upload-progress");
-    useAttachmentStore.getState().remove(filename);
-    throw error;
-  }
+/**
+ * Reads a file as base64 pieces of about PIECE_SIZE bytes; each piece
+ * decodes on its own. Calls are made one after another.
+ */
+export function readFileInPieces(
+  path: string,
+  onPiece: (base64: string, bytes: number) => Promise<void>
+) {
+  // a multiple of 3, so pieces never split a base64 group
+  const bufferSize = PIECE_SIZE - (PIECE_SIZE % 3);
+  return new Promise<void>((resolve, reject) => {
+    RNFetchBlob.fs
+      .readStream(path, "base64", bufferSize, 0)
+      .then((stream) => {
+        let chain = Promise.resolve();
+        let failed = false;
+        stream.open();
+        stream.onData((chunk) => {
+          const piece = chunk as string;
+          chain = chain.then(() =>
+            failed
+              ? undefined
+              : onPiece(piece, Math.floor((piece.length * 3) / 4)).catch(
+                  (e) => {
+                    failed = true;
+                    reject(e);
+                  }
+                )
+          );
+        });
+        stream.onError(reject);
+        stream.onEnd(() => {
+          chain.then(() => !failed && resolve(), reject);
+        });
+      })
+      .catch(reject);
+  });
 }
 
 export async function uploadFile(
@@ -172,7 +84,6 @@ export async function uploadFile(
   }
 ) {
   if (!requestOptions) return false;
-  const { url, headers } = requestOptions;
   await createCacheDir();
   DatabaseLogger.info(`Preparing to upload file: ${filename}`);
 
@@ -229,116 +140,22 @@ export async function uploadFile(
       `Starting upload of ${filename} at path: ${fileInfo.path} ${fileInfo.size}`
     );
 
-    if (Platform.OS === "android") {
-      useUserStore.setState({
-        disableAppLockRequests: true
-      });
-      const status = await PermissionsAndroid.request(
-        "android.permission.POST_NOTIFICATIONS"
-      );
-      if (status !== "granted") {
-        ToastManager.show({
-          message: strings.fileUploadNotificationPermissionDisallowed(),
-          type: "info"
-        });
-      }
-      await sleep(500);
-      useUserStore.setState({
-        disableAppLockRequests: false
-      });
-    }
-
-    let uploaded = false;
-
-    // Use multipart upload for files larger than MINIMUM_MULTIPART_FILE_SIZE
-    if (fileInfo.size >= MINIMUM_MULTIPART_FILE_SIZE) {
-      DatabaseLogger.info(
-        `Using multipart upload for large file: ${filename} (${fileInfo.size} bytes)`
-      );
-      const result = await multipartUploadFile(
-        filename,
-        filePath,
-        fileInfo.size,
-        requestOptions,
-        cancelToken
-      );
-      const status = result.status || 0;
-      uploaded = status >= 200 && status < 300;
-
-      if (!uploaded) {
-        const fileInfo = await RNFetchBlob.fs.stat(filePath);
-        throw new Error(
-          `${status}, name: ${fileInfo.filename}, length: ${
-            fileInfo.size
-          }, info: ${JSON.stringify(await result.text())}`
-        );
-      }
-    } else {
-      // Use single-part upload for smaller files
-      DatabaseLogger.info(
-        `Using single-part upload for file: ${filename} (${fileInfo.size} bytes)`
-      );
-      const upload = Upload.create({
-        customUploadId: filename,
-        path: Platform.OS === "ios" ? "file://" + fileInfo.path : fileInfo.path,
-        url: url,
-        method: "PUT",
-        headers: {
-          ...headers,
-          "content-type": "application/octet-stream"
-        },
-        appGroup: IOS_APPGROUPID,
-        notification: {
-          filename:
-            attachmentInfo && isImage(attachmentInfo?.mimeType)
-              ? "image"
-              : attachmentInfo?.filename || "file",
-          enabled: true,
-          enableRingTone: true,
-          autoClear: true
-        }
-      }).onChange((event) => {
-        switch (event.status) {
-          case "running":
-          case "pending":
-            useAttachmentStore
-              .getState()
-              .setProgress(
-                event.uploadedBytes || 0,
-                event.totalBytes || fileInfo.size,
-                filename,
-                0,
-                "upload"
-              );
-            DatabaseLogger.info(
-              `File upload progress: ${filename}, ${event.uploadedBytes}/${
-                event.totalBytes || fileInfo.size
-              }`
-            );
-            break;
-          case "completed":
-            DatabaseLogger.info("Upload completed");
-            break;
-        }
-      });
-      const result = await upload.start();
-      cancelToken.cancel = async () => {
-        useAttachmentStore.getState().remove(filename);
-        upload.cancel();
-      };
-
-      const status = result.responseCode || 0;
-      uploaded = status >= 200 && status < 300;
-
-      if (!uploaded) {
-        const fileInfo = await RNFetchBlob.fs.stat(filePath);
-        throw new Error(
-          `${status}, name: ${fileInfo.filename}, length: ${
-            fileInfo.size
-          }, info: ${JSON.stringify(result.error)}`
-        );
-      }
-    }
+    // Ryte: the encrypted file goes to the "Ryte Files" folder of the user's
+    // MEGA / Filen drive, through the cloud bridge, in 1 MB pieces.
+    let uploadedBytes = 0;
+    cancelToken.cancel = async () => {
+      useAttachmentStore.getState().remove(filename);
+    };
+    await RyteFiles.upload(filename, (onPiece) =>
+      readFileInPieces(filePath, async (piece, bytes) => {
+        await onPiece(piece);
+        uploadedBytes += bytes;
+        useAttachmentStore
+          .getState()
+          .setProgress(uploadedBytes, fileInfo.size, filename, 0, "upload");
+      })
+    );
+    const uploaded = true;
 
     useAttachmentStore.getState().remove(filename);
 

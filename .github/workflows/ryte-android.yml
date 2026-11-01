@@ -1,0 +1,122 @@
+name: Ryte Android
+
+# Builds the Ryte APK on every push to main (and on demand) and publishes it
+# as a GitHub release, so it can be downloaded straight to a phone.
+#
+# Signing: by default the APK is signed with the keystore committed in
+# apps/mobile/android/app (stable, so updates install over each other).
+# To sign with your own key, add these repository secrets:
+#   RYTE_KEYSTORE_BASE64   base64 of your .jks/.keystore file
+#   RYTE_KEYSTORE_PASSWORD, RYTE_KEY_ALIAS, RYTE_KEY_PASSWORD
+# (Switching keys later means uninstalling the old APK once.)
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "apps/web/**"
+      - ".github/workflows/ryte-web.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ryte-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=mobile
+          npm ci --prefix packages/ryte-cloud --no-audit
+
+      - name: Build the MEGA / Filen cloud bridge
+        run: node packages/ryte-cloud/scripts/build-bridge.mjs
+
+      - name: Check for TypeScript errors
+        run: |
+          npm run tx mobile:build
+          cd apps/mobile
+          npx tsc --noEmit
+
+      - name: Use your own signing key (if configured)
+        env:
+          RYTE_KEYSTORE_BASE64: ${{ secrets.RYTE_KEYSTORE_BASE64 }}
+        if: ${{ env.RYTE_KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "$RYTE_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/ryte.keystore"
+          echo "RYTE_KEYSTORE_FILE=$RUNNER_TEMP/ryte.keystore" >> $GITHUB_ENV
+
+      - name: Build APKs
+        env:
+          RYTE_KEYSTORE_PASSWORD: ${{ secrets.RYTE_KEYSTORE_PASSWORD }}
+          RYTE_KEY_ALIAS: ${{ secrets.RYTE_KEY_ALIAS }}
+          RYTE_KEY_PASSWORD: ${{ secrets.RYTE_KEY_PASSWORD }}
+          USE_PREBUILT_AARS: "false"
+        run: |
+          cd apps/mobile/android
+          chmod +x ./gradlew
+          ./gradlew :app:assembleRelease \
+            -PreactNativeArchitectures=arm64-v8a,armeabi-v7a \
+            -PusePrebuiltAars=false \
+            -PprBuildNumber=$(( $(date +%s) / 60 - 29000000 ))
+
+      - name: Collect APKs
+        id: apk
+        run: |
+          VERSION=$(node -p "require('./apps/mobile/package.json').version")
+          TAG="v${VERSION}-ryte.${{ github.run_number }}"
+          mkdir -p out
+          cp apps/mobile/android/app/build/outputs/apk/release/app-arm64-v8a-release.apk "out/Ryte-${VERSION}-${{ github.run_number }}-arm64.apk"
+          cp apps/mobile/android/app/build/outputs/apk/release/app-armeabi-v7a-release.apk "out/Ryte-${VERSION}-${{ github.run_number }}-armv7.apk"
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          ls -la out
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ryte-android
+          path: out/*.apk
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.apk.outputs.tag }}
+          name: Ryte ${{ steps.apk.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          files: out/*.apk
+          body: |
+            Ryte for Android. Most phones need the **arm64** APK; older 32-bit phones need **armv7**.
+            Install it from the phone, then sign in with your MEGA or Filen account.

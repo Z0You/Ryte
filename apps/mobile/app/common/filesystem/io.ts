@@ -27,6 +27,7 @@ import {
 import { DataFormat, SerializedKey } from "@notesnook/crypto";
 import { Platform } from "react-native";
 import RNFetchBlob from "react-native-blob-util";
+import { RyteFiles } from "../../ryte/bridge";
 import { eSendEvent } from "../../services/event-manager";
 import { IOS_APPGROUPID } from "../../utils/constants";
 import { DatabaseLogger, db } from "../database";
@@ -163,20 +164,13 @@ export async function deleteFile(
     return true;
   }
 
-  const { url, headers } = requestOptions;
-
+  // Ryte: remove it from the "Ryte Files" folder of the user's drive
   try {
-    const response = await RNFetchBlob.fetch("DELETE", url, headers);
-    const status = response.info().status;
-    const ok = status >= 200 && status < 300;
-    if (ok) {
-      deleteLocalFile(filename);
-    }
-    return ok;
+    await RyteFiles.remove([filename]);
+    deleteLocalFile(filename);
+    return true;
   } catch (e) {
-    DatabaseLogger.error(e, "Delete file", {
-      url: url
-    });
+    DatabaseLogger.error(e, "Delete file", { filename });
     return false;
   }
 }
@@ -194,32 +188,14 @@ export async function bulkDeleteFiles(
   }
 
   try {
-    const { url, headers } = requestOptions;
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        names: filenames
-      })
+    // Ryte: remove them from the "Ryte Files" folder of the user's drive
+    await RyteFiles.remove(filenames);
+    filenames.forEach((filename) => {
+      deleteLocalFile(filename);
     });
-
-    const result = isSuccessStatusCode(response.status);
-    if (result) {
-      filenames.forEach((filename) => {
-        deleteLocalFile(filename);
-      });
-    } else {
-      throw await response.text();
-    }
-    return result;
+    return true;
   } catch (e) {
-    DatabaseLogger.error(
-      typeof e === "string" ? parseS3Error(e as string) : (e as Error),
-      "Could not bulk delete files"
-    );
+    DatabaseLogger.error(e as Error, "Could not bulk delete files");
     return false;
   }
 }

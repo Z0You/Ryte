@@ -649,9 +649,8 @@ export async function areFeaturesAvailable<TIds extends FeatureId[]>(
 }
 
 async function getUserPlan() {
-  const user = await db.user.getUser();
-  const plan = user?.subscription?.plan || SubscriptionPlan.FREE;
-  return plan;
+  // Ryte: everyone gets the top plan.
+  return SubscriptionPlan.BELIEVER;
 }
 
 async function availableOn(id: FeatureId, value?: number) {
@@ -721,12 +720,32 @@ export async function getFeaturesUsage(): Promise<FeatureUsage[]> {
   return usage;
 }
 
+/**
+ * Ryte: every feature is unlocked for everyone. Data is stored in the user's
+ * own cloud drive (MEGA / Filen), so there are no plan-based limits. The only
+ * limit on storage is the free space of the user's own drive.
+ */
+const RYTE_UNLIMITED_NUMBER: Limit<"infinity"> = {
+  caption: "infinity",
+  value: Infinity,
+  isAllowed: () => true
+};
+const RYTE_UNLIMITED_BOOLEAN: Limit<true> = {
+  caption: true,
+  value: true,
+  isAllowed: () => true
+};
 function getFeatureLimitFromPlan<TId extends FeatureId>(
   feature: Feature<TId>,
-  plan: SubscriptionPlan
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _plan: SubscriptionPlan
 ): Limit<Caption<TId>> {
-  const key = PLAN_TO_AVAILABILITY[plan];
-  return feature.availability[key] as unknown as Limit<Caption<TId>>;
+  const best = feature.availability.believer;
+  const unlimited =
+    typeof best.value === "boolean"
+      ? RYTE_UNLIMITED_BOOLEAN
+      : RYTE_UNLIMITED_NUMBER;
+  return unlimited as unknown as Limit<Caption<TId>>;
 }
 
 const PLAN_TO_AVAILABILITY: Record<

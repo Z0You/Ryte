@@ -26,7 +26,6 @@ import {
 } from "../../common.js";
 import Constants from "../../utils/constants.js";
 import Collector from "./collector.js";
-import { type HubConnection } from "@microsoft/signalr";
 import Merger, { handleInboxItems } from "./merger.js";
 import { AutoSync } from "./auto-sync.js";
 import { logger } from "../../logger.js";
@@ -55,36 +54,7 @@ import {
 import { DownloadableFile } from "../../database/fs.js";
 import { SyncDevices } from "./devices.js";
 import { DefaultColors } from "../../collections/colors.js";
-
-enum LogLevel {
-  /** Log level for very low severity diagnostic messages. */
-  Trace = 0,
-  /** Log level for low severity diagnostic messages. */
-  Debug = 1,
-  /** Log level for informational diagnostic messages. */
-  Information = 2,
-  /** Log level for diagnostic messages that indicate a non-fatal problem. */
-  Warning = 3,
-  /** Log level for diagnostic messages that indicate a failure in the current operation. */
-  Error = 4,
-  /** Log level for diagnostic messages that indicate a failure that will terminate the entire application. */
-  Critical = 5,
-  /** The highest possible log level. Used when configuring logging to indicate that no log messages should be emitted. */
-  None = 6
-}
-
-enum HubConnectionState {
-  /** The hub connection is disconnected. */
-  Disconnected = "Disconnected",
-  /** The hub connection is connecting. */
-  Connecting = "Connecting",
-  /** The hub connection is connected. */
-  Connected = "Connected",
-  /** The hub connection is disconnecting. */
-  Disconnecting = "Disconnecting",
-  /** The hub connection is reconnecting. */
-  Reconnecting = "Reconnecting"
-}
+import { CloudSync } from "../ryte/cloud-sync.js";
 
 export type SyncOptions = {
   type: "full" | "fetch" | "send";
@@ -153,8 +123,9 @@ export class Sync {
   merger;
   autoSync;
   logger = logger.scope("Sync");
-  syncConnectionMutex = new Mutex();
-  connection?: HubConnection;
+  syncMutex = new Mutex();
+  cloud: CloudSync;
+  private cancelled = false;
   devices;
   private conflictedNoteIds: string[] = [];
   private uncachedAttachments: DownloadableFile[] = [];
@@ -164,30 +135,33 @@ export class Sync {
     this.merger = new Merger(db);
     this.autoSync = new AutoSync(db, 1000);
     this.devices = new SyncDevices(db.kv, db.tokenManager);
+    this.cloud = new CloudSync(db);
 
     db.eventManager.subscribe(EVENTS.userLoggedOut, async () => {
-      await this.connection?.stop();
+      this.cancelled = true;
       this.autoSync.stop();
     });
   }
 
   async start(options: SyncOptions) {
-    await this.createConnection(options);
-    if (!this.connection) return;
+    // Ryte: one sync at a time; there is no live connection to a server,
+    // every sync reads and writes the "Ryte" folder of the user's drive.
+    await this.syncMutex.runExclusive(() => this.run(options));
+  }
 
-    if (!(await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.sync))) {
-      await this.connection.stop();
+  private async run(options: SyncOptions) {
+    this.cancelled = false;
+    if (!(await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.sync)))
       return;
-    }
     if (!(await this.db.user.getUser())) return;
 
     this.logger.info("Starting sync", options);
 
-    this.connection.onclose((error = new Error("Connection closed.")) => {
-      this.db.eventManager.publish(EVENTS.syncAborted);
-      this.logger.error(error);
-      throw new Error("Connection closed.");
-    });
+    await this.cloud.open();
+    // keys added by other devices (e.g. the attachments key)
+    await this.db.ryte.refresh().catch((e) =>
+      this.logger.error(e, "Could not refresh Ryte account")
+    );
 
     const { deviceId } = await this.init(options.force);
     this.logger.info("Initialized sync", { deviceId });
@@ -197,25 +171,29 @@ export class Sync {
       this.logger.info("Data fetched");
     }
 
-    if (
-      (options.type === "send" || options.type === "full") &&
-      (await this.send(deviceId, options.force))
-    )
-      this.logger.info("New data sent");
+    if (options.type === "send" || options.type === "full") {
+      const forcePush =
+        options.force || !!(await this.db.kv().read("ryteForcePush"));
+      if (await this.send(deviceId, forcePush))
+        this.logger.info("New data sent");
+      if (forcePush) await this.db.kv().delete("ryteForcePush");
+    }
+
+    if (options.type === "full" && !this.cancelled) {
+      await this.cloud
+        .compactIfNeeded(deviceId, async () => {
+          const chunks: SyncTransferItem[] = [];
+          for await (const chunk of this.collector.collect(500, true))
+            chunks.push(chunk);
+          return chunks;
+        })
+        .catch((e) => this.logger.error(e, "Could not compact sync folder"));
+    }
 
     await this.stop(options);
-
-    if (
-      !(await checkSyncStatus(this.db.eventManager, SYNC_CHECK_IDS.autoSync))
-    ) {
-      await this.connection.stop();
-      this.autoSync.stop();
-    }
   }
 
   async init(isForceSync?: boolean) {
-    await this.checkConnection();
-
     if (isForceSync) {
       await this.devices.unregister();
       await this.devices.register();
@@ -233,21 +211,23 @@ export class Sync {
   }
 
   async fetch(deviceId: string, options: SyncOptions) {
-    await this.checkConnection();
-
-    try {
-      await this.connection?.invoke("RequestFetchV4", deviceId);
-    } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes("HubException: Method does not exist")
-      ) {
-        this.logger.warn(
-          "RequestFetchV4 failed, falling back to RequestFetchV3"
-        );
-        await this.connection?.invoke("RequestFetchV3", deviceId);
-      } else throw error;
+    const keys = await this.db.user.getDataEncryptionKeys();
+    if (!keys || !keys.length) {
+      this.db.eventManager.publish(EVENTS.userSessionExpired);
+      throw new Error("User encryption keys not generated. Please relogin.");
     }
+
+    await this.cloud.fetch(
+      deviceId,
+      async (chunk) => {
+        if (this.cancelled) throw new Error("Sync canceled.");
+        this.logger.info(
+          `Received chunk for type ${chunk.type} with ${chunk.items.length} items.`
+        );
+        await this.processChunk(chunk, keys, options);
+      },
+      (count) => sendSyncProgressEvent(this.db.eventManager, `download`, count)
+    );
 
     if (this.conflictedNoteIds.length > 0) {
       await this.db
@@ -272,37 +252,36 @@ export class Sync {
   async send(deviceId: string, isForceSync?: boolean) {
     await this.uploadAttachments();
 
-    let done = 0;
+    const chunks: SyncTransferItem[] = [];
     let total = 0;
-    for await (const item of this.collector.collect(100, isForceSync)) {
-      total += item.items.length;
-      const result = await this.pushItem(deviceId, item);
-      this.logger.info(`Batch sent for type ${item.type}`, {
-        result,
-        length: item.items.length,
-        type: item.type
-      });
-      if (result) {
-        done += item.items.length;
-        sendSyncProgressEvent(this.db.eventManager, "upload", done);
-      } else {
-        this.logger.error(
-          new Error(`Failed to send batch. Server returned falsy response.`)
-        );
-        // stop here so the collector doesn't mark the rejected items as synced
-        break;
-      }
+    for await (const chunk of this.collector.collect(100, isForceSync)) {
+      chunks.push(chunk);
+      total += chunk.items.length;
     }
-    this.logger.info(
-      `Sync send completed. Sent ${done} out of ${total} items.`,
-      { done, total }
-    );
-    if (done !== total)
-      throw new Error(
-        `Failed to send all items. Sent ${done} out of ${total}.`
-      );
     if (total === 0) return false;
-    await this.connection?.send("PushCompletedV2", deviceId);
+
+    try {
+      await this.cloud.push(deviceId, chunks);
+    } catch (e) {
+      // the collector already marked these items as synced; undo that so
+      // they are sent again next time
+      for (const chunk of chunks) {
+        const collection = this.db[SYNC_COLLECTIONS_MAP[chunk.type]].collection;
+        await this.db
+          .sql()
+          .updateTable(collection.type)
+          .where(
+            "id",
+            "in",
+            chunk.items.map((i) => i.id)
+          )
+          .set({ synced: false })
+          .execute();
+      }
+      throw e;
+    }
+    sendSyncProgressEvent(this.db.eventManager, "upload", total);
+    this.logger.info(`Sync send completed. Sent ${total} items.`);
     return true;
   }
 
@@ -312,7 +291,7 @@ export class Sync {
       (await this.collector.hasUnsyncedChanges())
     ) {
       this.logger.info("Changes made during last sync. Syncing again...");
-      await this.start({ type: "send" });
+      await this.run({ type: "send" });
       return;
     }
     // refresh monographs
@@ -327,7 +306,7 @@ export class Sync {
 
   async cancel() {
     this.logger.info("Sync canceled");
-    await this.connection?.stop();
+    this.cancelled = true;
   }
 
   /**
@@ -476,162 +455,6 @@ export class Sync {
     await collection.put(items as any);
   }
 
-  private async pushItem(deviceId: string, item: SyncTransferItem) {
-    await this.checkConnection();
-    return (await this.connection?.invoke("PushItems", deviceId, item)) === 1;
-  }
-
-  private async createConnection(options: SyncOptions) {
-    if (this.connection) return;
-
-    const { HubConnectionBuilder, HttpTransportType, JsonHubProtocol } =
-      await import("@microsoft/signalr");
-
-    const tokenManager = this.db.tokenManager;
-    this.connection = new HubConnectionBuilder()
-      .withUrl(`${Constants.API_HOST}/hubs/sync/v2`, {
-        accessTokenFactory: async () => {
-          const token = await tokenManager.getAccessToken();
-          if (!token) throw new Error("Failed to get access token.");
-          return token;
-        },
-        skipNegotiation: true,
-        transport: HttpTransportType.WebSockets,
-        logger: {
-          log: (level, message) => {
-            const scopedLogger = logger.scope("SignalR::SyncHub");
-            switch (level) {
-              case LogLevel.Critical:
-                return scopedLogger.fatal(new Error(message));
-              case LogLevel.Error: {
-                this.db.eventManager.publish(EVENTS.syncAborted, message);
-                return scopedLogger.error(new Error(message));
-              }
-              case LogLevel.Warning:
-                return scopedLogger.warn(message);
-            }
-          }
-        }
-      })
-      .withHubProtocol(new JsonHubProtocol())
-      .build();
-    this.connection.serverTimeoutInMilliseconds = 60 * 1000 * 5;
-    this.connection.on("PushCompletedV2", (deviceId: string) =>
-      this.onPushCompleted(deviceId)
-    );
-    this.connection.on("SendVaultKey", async (vaultKey) => {
-      if (this.connection?.state !== HubConnectionState.Connected) return false;
-
-      if (
-        vaultKey &&
-        vaultKey.cipher !== null &&
-        vaultKey.iv !== null &&
-        vaultKey.salt !== null &&
-        vaultKey.length > 0
-      ) {
-        const vault = await this.db.vaults.default();
-        if (!vault)
-          await migrateVaultKey(
-            this.db,
-            vaultKey,
-            5.9,
-            CURRENT_DATABASE_VERSION
-          );
-      }
-
-      return true;
-    });
-
-    this.connection.on("SendItems", async (chunk) => {
-      if (this.connection?.state !== HubConnectionState.Connected) return false;
-
-      const keys = await this.db.user.getDataEncryptionKeys();
-      if (!keys || !keys.length) {
-        this.logger.error(
-          new Error("User encryption keys not generated. Please relogin.")
-        );
-        this.db.eventManager.publish(EVENTS.userSessionExpired);
-        return false;
-      }
-      this.logger.info(
-        `Received chunk for type ${chunk.type} with ${chunk.items.length} items.`,
-        {
-          ids: chunk.items.map((i: any) => i.id)
-        }
-      );
-      await this.processChunk(chunk, keys, options);
-
-      sendSyncProgressEvent(this.db.eventManager, `download`, chunk.count);
-
-      return true;
-    });
-
-    this.connection.on("SendMonographs", async (monographs: Monograph[]) => {
-      if (this.connection?.state !== HubConnectionState.Connected) return false;
-
-      const ids = monographs.map((m) => m.id);
-      await this.db.monographsCollection.collection.put(
-        monographs.map((m) => ({
-          ...m,
-          type: "monograph"
-        }))
-      );
-      await this.db.monographs.refresh().catch(this.logger.error);
-      this.db.eventManager.publish(EVENTS.monographsUpdated, ids);
-
-      return true;
-    });
-
-    this.connection.on(
-      "SendInboxItems",
-      async (inboxItems: SyncInboxItem[]) => {
-        if (this.connection?.state !== HubConnectionState.Connected) {
-          return false;
-        }
-
-        await handleInboxItems(inboxItems, this.db);
-
-        return true;
-      }
-    );
-  }
-
-  private async checkConnection() {
-    await this.syncConnectionMutex.runExclusive(async () => {
-      try {
-        if (
-          this.connection &&
-          this.connection.state !== HubConnectionState.Connected
-        ) {
-          if (this.connection.state !== HubConnectionState.Disconnected) {
-            await this.connection.stop();
-          }
-
-          await promiseTimeout(30000, this.connection.start());
-        }
-      } catch (e) {
-        this.logger.error(e, "Could not connect to the Sync server.");
-        if (e instanceof Error) {
-          this.logger.warn(e.message);
-          throw new Error(
-            "Could not connect to the Sync server. Please try again."
-          );
-        }
-      }
-    });
-  }
-}
-
-function promiseTimeout(ms: number, promise: Promise<unknown>) {
-  // Create a promise that rejects in <ms> milliseconds
-  const timeout = new Promise((resolve, reject) => {
-    const id = setTimeout(() => {
-      clearTimeout(id);
-      reject(new Error("Sync timed out in " + ms + "ms."));
-    }, ms);
-  });
-  // Returns a race between our timeout and the passed in promise
-  return Promise.race([promise, timeout]);
 }
 
 async function deserializeItem(

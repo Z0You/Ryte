@@ -44,6 +44,9 @@ import { ConfirmDialog, showLogoutConfirmation } from "../dialogs/confirm";
 import { TaskManager } from "../common/task-manager";
 import { strings } from "@notesnook/intl";
 import { ScrollContainer } from "@notesnook/ui";
+import { Label, Radio } from "@theme-ui/components";
+import { CloudProvider, CloudStatus } from "@ryte/cloud";
+import { ryteCloud } from "../ryte/cloud";
 import {
   authRoutes,
   AuthRoutes,
@@ -132,6 +135,18 @@ type AuthComponent<TRoute extends AuthRoutes> = (
 function getRouteComponent<TRoute extends AuthRoutes>(
   route: TRoute
 ): AuthComponent<TRoute> | undefined {
+  // Ryte: there are no Notesnook accounts. Every sign-in, sign-up and
+  // session-expired screen is the "connect your cloud storage" flow.
+  switch (route) {
+    case "login:email":
+    case "login:password":
+    case "signup":
+    case "sessionExpiry":
+    case "recover":
+    case "mfa:code":
+    case "mfa:select":
+      return RyteConnect as AuthComponent<TRoute>;
+  }
   switch (route) {
     case "login:email":
       return LoginEmail as AuthComponent<TRoute>;
@@ -1057,4 +1072,241 @@ function maskEmail(email: string) {
 
 function isSessionExpired() {
   return Config.get("sessionExpired", false);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                    Ryte                                    */
+/* -------------------------------------------------------------------------- */
+
+type RyteFormData = Record<string, string>;
+
+/**
+ * Ryte sign-in: 1) connect MEGA or Filen, 2) enter the encryption password.
+ * Notes are encrypted with that password on the device before they are
+ * stored in the user's drive, so the drive never sees them in plaintext.
+ */
+function RyteConnect(props: BaseAuthComponentProps<"login:email">) {
+  const { openURL } = props;
+  const [status, setStatus] = useState<CloudStatus | undefined>(() =>
+    ryteCloud.status()
+  );
+  const [step, setStep] = useState<"storage" | "password">(
+    ryteCloud.status() ? "password" : "storage"
+  );
+
+  if (step === "storage" || !status)
+    return (
+      <RyteStorageStep
+        openURL={openURL}
+        onConnected={(status) => {
+          setStatus(status);
+          setStep("password");
+        }}
+      />
+    );
+
+  return (
+    <RytePasswordStep
+      openURL={openURL}
+      status={status}
+      onChangeStorage={async () => {
+        await ryteCloud.disconnect();
+        setStatus(undefined);
+        setStep("storage");
+      }}
+    />
+  );
+}
+
+function RyteStorageStep(props: {
+  openURL: OpenURLFunction;
+  onConnected: (status: CloudStatus) => void;
+}) {
+  const [provider, setProvider] = useState<CloudProvider>("mega");
+  return (
+    <AuthForm
+      type="login:email"
+      title="Connect your cloud storage"
+      subtitle="Ryte keeps your notes and attachments end-to-end encrypted in your own MEGA or Filen account. Every feature is included and there are no upload limits: the only limit is the free space in your account."
+      loading={{
+        title: "Connecting…",
+        subtitle: "Signing in to your cloud storage."
+      }}
+      openURL={props.openURL}
+      canSkip
+      onSubmit={async (form) => {
+        const data = form as unknown as RyteFormData;
+        const status = await ryteCloud.connect(
+          provider,
+          data.email,
+          data.password,
+          data.code
+        );
+        props.onConnected(status);
+      }}
+    >
+      {(form) => {
+        const data = form as unknown as RyteFormData | undefined;
+        return (
+          <>
+            <Flex sx={{ gap: 4, mt: 2 }} data-test-id="ryte-provider">
+              {(["mega", "filen"] as const).map((id) => (
+                <Label
+                  key={id}
+                  sx={{
+                    alignItems: "center",
+                    width: "auto",
+                    cursor: "pointer",
+                    fontSize: "subtitle"
+                  }}
+                >
+                  <Radio
+                    name="provider"
+                    value={id}
+                    data-test-id={`ryte-provider-${id}`}
+                    checked={provider === id}
+                    onChange={() => setProvider(id)}
+                  />
+                  {id === "mega" ? "MEGA" : "Filen"}
+                </Label>
+              ))}
+            </Flex>
+            <AuthField
+              id="email"
+              type="email"
+              autoComplete="username"
+              label={`${provider === "mega" ? "MEGA" : "Filen"} email`}
+              autoFocus
+              defaultValue={data?.email}
+            />
+            <AuthField
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              label={`${provider === "mega" ? "MEGA" : "Filen"} password`}
+              defaultValue={data?.password}
+              helpText="Used once to sign in. Ryte keeps only the session on this device, never this password."
+            />
+            <AuthField
+              id="code"
+              type="text"
+              required={false}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              label="Two-factor code (only if your account uses it)"
+              defaultValue={data?.code}
+            />
+            <SubmitButton
+              text={`Connect ${provider === "mega" ? "MEGA" : "Filen"}`}
+            />
+          </>
+        );
+      }}
+    </AuthForm>
+  );
+}
+
+function RytePasswordStep(props: {
+  openURL: OpenURLFunction;
+  status: CloudStatus;
+  onChangeStorage: () => void;
+}) {
+  const { openURL, status } = props;
+  const [isNew, setIsNew] = useState<boolean>();
+  const [error, setError] = useState<string>();
+
+  useEffect(() => {
+    db.ryte
+      .exists()
+      .then((exists) => setIsNew(!exists))
+      .catch((e) => setError((e as Error).message));
+  }, []);
+
+  if (error)
+    return (
+      <Flex
+        sx={{
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          size: "100%",
+          gap: 2
+        }}
+      >
+        <ErrorText error={error} />
+        <Button variant="secondary" onClick={props.onChangeStorage}>
+          Use another account
+        </Button>
+      </Flex>
+    );
+  if (isNew === undefined)
+    return (
+      <Loader
+        title="Opening your storage…"
+        text={`Looking for Ryte data in ${status.displayName}.`}
+      />
+    );
+
+  return (
+    <AuthForm
+      type="login:password"
+      title={
+        isNew ? "Choose an encryption password" : "Enter your encryption password"
+      }
+      subtitle={
+        <SubtitleWithAction
+          text={
+            isNew
+              ? `Connected to ${status.displayName} as ${status.email}. Your notes are encrypted with this password before they leave this device. It cannot be recovered: if you forget it, your synced notes cannot be decrypted.`
+              : `Connected to ${status.displayName} as ${status.email}. Enter the encryption password you chose when you first set up Ryte.`
+          }
+          action={{ text: "Use another account", onClick: props.onChangeStorage }}
+        />
+      }
+      loadForever
+      loading={{
+        title: "Unlocking your notes…",
+        subtitle: "Deriving your encryption key. This takes a few seconds."
+      }}
+      openURL={openURL}
+      onSubmit={async (form) => {
+        const data = form as unknown as RyteFormData;
+        if (isNew && data.password !== data["confirm-password"])
+          throw new Error("Passwords do not match.");
+        if (isNew && data.password.length < 8)
+          throw new Error("Use at least 8 characters.");
+        await db.ryte.signIn(data.password);
+        Config.set("encryptBackups", true);
+        Config.set("sessionExpired", false);
+        await userstore.init();
+        openURL("/notes/", { authenticated: true });
+      }}
+    >
+      {(form) => {
+        const data = form as unknown as RyteFormData | undefined;
+        return (
+          <>
+            <AuthField
+              id="password"
+              type="password"
+              autoComplete={isNew ? "new-password" : "current-password"}
+              label="Encryption password"
+              autoFocus
+              defaultValue={data?.password}
+            />
+            {isNew && (
+              <AuthField
+                id="confirm-password"
+                type="password"
+                autoComplete="new-password"
+                label="Confirm encryption password"
+                defaultValue={data?.["confirm-password"]}
+              />
+            )}
+            <SubmitButton text={isNew ? "Create & start syncing" : "Unlock"} />
+          </>
+        );
+      }}
+    </AuthForm>
+  );
 }

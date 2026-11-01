@@ -1,5 +1,5 @@
 /*
-This file is part of the Notesnook project (https://notesnook.com/)
+This file is part of the Ryte project (https://notesnook.com/)
 
 Copyright (C) 2023 Streetwriters (Private) Limited
 
@@ -242,10 +242,10 @@ export const strings = {
   monographSelfDestructHeading: () => t`Self destruct`,
   monographSelfDestructDesc: () =>
     t`Published note link will be automatically deleted once it is viewed by someone.`,
-  monographLearnMore: () => t`Learn more about Notesnook Monograph`,
-  rateAppHeading: () => t`Do you enjoy using Notesnook?`,
+  monographLearnMore: () => t`Learn more about Ryte Monograph`,
+  rateAppHeading: () => t`Do you enjoy using Ryte?`,
   rateAppDesc: () =>
-    t`It took us a year to bring Notesnook to life. Share your experience and suggestions to help us improve it.`,
+    t`It took us a year to bring Ryte to life. Share your experience and suggestions to help us improve it.`,
   recoveryKeySavedConfirmation: () =>
     t`Tap twice to confirm you have saved the recovery key.`,
   noBlocksLinked: () => t`No blocks linked`,
@@ -425,10 +425,10 @@ $day$: Current day (eg. Monday)`,
   issueDesc: () =>
     t`We are sorry, it seems that the app crashed due to an error. You can submit a bug report below so we can fix this asap.`,
   issueDesc2: () =>
-    t`Let us know if you have faced any issue/bug while using Notesnook. We will try to fix it as soon as possible.`,
+    t`Let us know if you have faced any issue/bug while using Ryte. We will try to fix it as soon as possible.`,
   migrationSaveBackup: () => t`Save a backup of your notes`,
   migrationSaveBackupDesc: () =>
-    t`Thank you for updating Notesnook! We will be applying some minor changes for a better note taking experience.`,
+    t`Thank you for updating Ryte! We will be applying some minor changes for a better note taking experience.`,
   moveNotebook: (count: number, title: string) =>
     plural(count, {
       one: `Moving ${title}`,
@@ -631,25 +631,25 @@ $day$: Current day (eg. Monday)`,
     0: {
       title: () => t`Subscription awarded from Streetwriters`,
       desc: () =>
-        t`You were awarded a subscription to Notesnook Pro by Streetwriters.`
+        t`You were awarded a subscription to Ryte Pro by Streetwriters.`
     },
     1: {
       title: () => t`Subscribed on iOS`,
       desc: () =>
-        t`You subscribed to Notesnook Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings.`
+        t`You subscribed to Ryte Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings.`
     },
     2: {
       title: () => t`Subscribed on Android`,
       desc: () =>
-        t`You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase.`
+        t`You subscribed to Ryte Pro on Android Phone/Tablet using Google In App Purchase.`
     },
     3: {
       title: () => t`Subscribed on Web`,
-      desc: () => t`You subscribed to Notesnook Pro on the Web/Desktop App.`
+      desc: () => t`You subscribed to Ryte Pro on the Web/Desktop App.`
     },
     4: {
       title: () => t`Subscribed using gift card`,
-      desc: () => t`You subscribed to Notesnook Pro using a gift card.`
+      desc: () => t`You subscribed to Ryte Pro using a gift card.`
     }
   },
   dark: () => t`Dark`,
@@ -658,8 +658,8 @@ $day$: Current day (eg. Monday)`,
   loadFromFile: () => t`Load from file`,
   setAsDarkTheme: () => t`Set as dark theme`,
   setAsLightTheme: () => t`Set as light theme`,
-  defaultDarkThemeDesc: () => t`The default dark theme for the Notesnook app`,
-  defaultLightThemeDesc: () => t`The default light theme for Notesnook app.`,
+  defaultDarkThemeDesc: () => t`The default dark theme for the Ryte app`,
+  defaultLightThemeDesc: () => t`The default light theme for Ryte app.`,
   source: () => t`Source`,
   createAGroup: () => t`Create a group`,
   fileCheckFailed: (reason: string) =>
@@ -675,7 +675,7 @@ $day$: Current day (eg. Monday)`,
   fileSaved: (name: string, platform: string) =>
     select(platform, {
       android: `${name} saved to selected path`,
-      other: `${name} saved to File Manager/Notesnook/downloads`
+      other: `${name} saved to File Manager/Ryte/downloads`
     }),
   downloadError: (message: string) => t`Error downloading file: ${message}`,
   invalid: (type: string) => t`Invalid ${type}`,
@@ -754,7 +754,7 @@ $day$: Current day (eg. Monday)`,
         () => t`privileged few`
       ],
       body: () =>
-        t`Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Notesnook encrypts all your data before it leaves your device. With Notesnook no one can ever sell your data again.`
+        t`Your privacy matters to us, no matter who you are. In a world where everyone is trying to spy on you, Ryte encrypts all your data before it leaves your device. With Ryte no one can ever sell your data again.`
     },
     {
       tesimonial: () =>
@@ -895,14 +895,14 @@ $day$: Current day (eg. Monday)`,
   mfaAuthAppSelector: () => t`Don't have access to your authenticator app?`,
   mfaEmailTitle: () => t`Setup using email`,
   mfaEmailDesc: () =>
-    t`Notesnook will send you a 2FA code on your email when prompted`,
+    t`Ryte will send you a 2FA code on your email when prompted`,
   mfaEmailSubtitle: () =>
     t`Please confirm your identity by entering the authentication code sent to your email address.`,
   mfaEmailInstructions: () => t`It may take a minute to receive your code.`,
   mfaEmailSelector: () => t`Don't have access to your email address?`,
   mfaSmsTitle: () => t`Setup using SMS`,
   mfaSmsDesc: () =>
-    t`Notesnook will send you an SMS with a 2FA code when prompted`,
+    t`Ryte will send you an SMS with a 2FA code when prompted`,
   mfaSmsSubtitle: (phoneNumber?: string) =>
     t`Please confirm your identity by entering the authentication code sent to ${
       phoneNumber ? phoneNumber : "your registered phone number."
@@ -967,13 +967,13 @@ $day$: Current day (eg. Monday)`,
   subscriptionNotActivated: () => t`Subscription not activated?`,
   loadingSubscription: () => t`Loading subscription details`,
   loadingSubscriptionDesc: () => t`Please wait while we load your subscription`,
-  notesnookPro: () => t`Notesnook Pro`,
+  notesnookPro: () => t`Ryte Pro`,
   subscribedOnVerify: (date: string) =>
-    t`You subscribed to Notesnook Pro on ${date}. Verify this subscription?`,
+    t`You subscribed to Ryte Pro on ${date}. Verify this subscription?`,
   verifySubscription: () => t`Verify subscription`,
   subscriptionVerifyWait: () =>
     t`Please wait while we verify your subscription`,
-  verifySubDesc: () => t`Verify your subscription to Notesnook Pro`,
+  verifySubDesc: () => t`Verify your subscription to Ryte Pro`,
   logoutWarnin: () =>
     t`Logging out will clear all data stored on THIS DEVICE. Make sure you have synced all your changes before logging out.`,
   logoutError: () => t`Error logging out`,
@@ -1163,7 +1163,7 @@ $day$: Current day (eg. Monday)`,
     t`Contact us directly via support@streetwriters.co for any help or support`,
   documentation: () => t`Documentation`,
   documentationDesc: () =>
-    t`Read the documentation to learn more about Notesnook`,
+    t`Read the documentation to learn more about Ryte`,
   debugging: () => t`Debugging`,
   debuggingDesc: () =>
     t`Get helpful debug info about the app to help us find bugs.`,
@@ -1175,9 +1175,9 @@ $day$: Current day (eg. Monday)`,
     t`Join our Telegram group to chat with other users and the team`,
   joinMastodon: () => t`Follow us on Mastodon`,
   joinMastodonDesc: () =>
-    t`Follow us on Mastodon for updates and news about Notesnook`,
+    t`Follow us on Mastodon for updates and news about Ryte`,
   followOnX: () => t`Follow us on X`,
-  followOnXDesc: () => t`Follow us on X for updates and news about Notesnook`,
+  followOnXDesc: () => t`Follow us on X for updates and news about Ryte`,
   joinDiscord: () => t`Join our Discord server`,
   joinDiscordDesc: () =>
     t`Join our Discord server to chat with other users and the team`,
@@ -1186,15 +1186,15 @@ $day$: Current day (eg. Monday)`,
   privacyPolicy: () => t`Privacy policy`,
   privacyPolicyDesc: () => t`Read the privacy policy`,
   licenses: () => t`Open source licenses`,
-  ossLibs: () => t`Open source libraries used in Notesnook`,
+  ossLibs: () => t`Open source libraries used in Ryte`,
   about: () => t`About`,
   downloadOnDesktop: () => t`Download on desktop`,
   downloadOnDesktopDesc: () =>
-    t`Get Notesnook app on your desktop and access all notes`,
+    t`Get Ryte app on your desktop and access all notes`,
   roadmap: () => t`Roadmap`,
-  roadmapDesc: () => t`See what the future of Notesnook is going to be like.`,
+  roadmapDesc: () => t`See what the future of Ryte is going to be like.`,
   checkForUpdates: () => t`Check for updates`,
-  checkForUpdatesDesc: () => t`Check for new version of Notesnook`,
+  checkForUpdatesDesc: () => t`Check for new version of Ryte`,
   autoUpdateCheck: () => t`Check for updates automatically`,
   autoUpdateCheckDesc: () =>
     t`Check for new version of the app available on app launch`,
@@ -1234,8 +1234,8 @@ $day$: Current day (eg. Monday)`,
   backupComplete: () => t`Backup complete`,
   backupSaved: (platform: string) =>
     select(platform, {
-      android: 'Backup file saved in "Notesnook backups" folder on your phone.',
-      other: "Backup file is saved in File Manager/Notesnook folder"
+      android: 'Backup file saved in "Ryte backups" folder on your phone.',
+      other: "Backup file is saved in File Manager/Ryte folder"
     }),
   shareBackup: () => t`Share backup`,
   neverAskAgain: () => t`Never ask again`,
@@ -1248,7 +1248,7 @@ $day$: Current day (eg. Monday)`,
   savingFile: (path: string) => t`Saving file: ${path}`,
   creatingBackupNamed: (name: string) => t`Creating backup (${name})`,
   backupDataDesc: () =>
-    t`All your backups are stored in 'Phone Storage/Notesnook/backups/' folder`,
+    t`All your backups are stored in 'Phone Storage/Ryte/backups/' folder`,
   backupSuccess: () => t`Backup successful`,
   biometricsAuthFailed: () =>
     t`Biometrics authentication failed. Please try again.`,
@@ -1258,8 +1258,8 @@ $day$: Current day (eg. Monday)`,
   rateAppMessage: () => t`We would love to know what you think!`,
   rateAppActionText: (platform: string) =>
     platform === "ios"
-      ? t`Rate Notesnook on App Store`
-      : t`Rate Notesnook on Play Store`,
+      ? t`Rate Ryte on App Store`
+      : t`Rate Ryte on Play Store`,
   recoveryKeyMessage: () => t`Keep your data safe`,
   recoveryKeyMessageActionText: () => t`Save your account recovery key`,
   loginMessage: () => t`You are not logged in`,
@@ -1277,7 +1277,7 @@ $day$: Current day (eg. Monday)`,
   disable: () => t`Disable`,
   notificationsDisabled: () => t`Notifications disabled`,
   notificationsDisabledDesc: () =>
-    t`Reminders cannot be set because notifications have been disabled from app settings. If you want to keep receiving reminder notifications, enable notifications for Notesnook from app settings.`,
+    t`Reminders cannot be set because notifications have been disabled from app settings. If you want to keep receiving reminder notifications, enable notifications for Ryte from app settings.`,
   openSettings: () => t`Open settings`,
   close: () => t`Close`,
   emailConfirmationLinkSent: () =>
@@ -1484,7 +1484,7 @@ For example:
   exportedNotesLocked: () =>
     t`Some exported notes are locked, Unlock to export them`,
   selectFolderForBackupFilesDesc: () =>
-    t`Select folder where Notesnook backup files are stored to view and restore them from the app`,
+    t`Select folder where Ryte backup files are stored to view and restore them from the app`,
   selectBackupFolder: () => t`Select folder with backup files`,
   selectBackupFileDesc: () =>
     t`Select a backup file from your device to restore backup`,
@@ -1637,13 +1637,13 @@ For example:
   yourFullName: () => t`Your full name`,
   memberSince: (date: string) => t`Member since ${date}`,
   betaLoginNotice: () =>
-    t`You are logging into the beta version of Notesnook. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously.`,
+    t`You are logging into the beta version of Ryte. Switching between beta &amp; stable versions can cause weird issues including data loss. It is recommended that you do not use both simultaneously.`,
   loggingIn: () => t`Logging you in`,
   pleaseWaitLogin: () => t`Please wait while you are authenticated.`,
   emailConfirmed: () => t`Your email has been confirmed.`,
   confirmEmailThankyou: () =>
     t`Thank you for choosing end-to-end encrypted note taking. Now you can sync your notes to unlimited devices.`,
-  shareWithFriends: () => t`Share Notesnook with friends!`,
+  shareWithFriends: () => t`Share Ryte with friends!`,
   tagPromoWinText: () => [
     t`Use`,
     t`#notesnook`,
@@ -1913,10 +1913,10 @@ Please note that we will respond to your feature request on the link above. **We
   desktopIntegration: () => t`Desktop integration`,
   autoStartOnSystemStartup: () => t`Auto start on system startup`,
   autoStartDescription: () =>
-    t`If true, Notesnook will automatically start up when you turn on & login to your system.`,
+    t`If true, Ryte will automatically start up when you turn on & login to your system.`,
   startMinimized: () => t`Start minimized`,
   startMinimizedDescription: () =>
-    t`If true, Notesnook will start minimized to either the system tray or your system taskbar/dock. This setting only works with Auto start on system startup is enabled.`,
+    t`If true, Ryte will start minimized to either the system tray or your system taskbar/dock. This setting only works with Auto start on system startup is enabled.`,
   minimizeToSystemTray: () => t`Minimize to system tray`,
   minimizeToSystemTrayDescription: () =>
     t`Pressing "—" will hide the app in your system tray.`,
@@ -1950,15 +1950,15 @@ Please note that we will respond to your feature request on the link above. **We
   installUpdate: () => t`Install update`,
   sourceCode: () => t`Source code`,
   sourceCodeDescription: () =>
-    t`All the source code for Notesnook is available & open for everyone on GitHub.`,
+    t`All the source code for Ryte is available & open for everyone on GitHub.`,
   viewSourceCode: () => t`View source code`,
   checkRoadmap: () => t`Check roadmap`,
   availableOnIOS: () => t`Available on iOS`,
   availableOnIOSAndAndroid: () => t`Available on iOS & Android`,
   availableOnIOSDescription: () =>
-    t`Get Notesnook app on your iPhone and access all your notes on the go.`,
+    t`Get Ryte app on your iPhone and access all your notes on the go.`,
   availableOnIOSAndAndroidDescription: () =>
-    t`Get Notesnook app on your iPhone or Android device and access all your notes on the go.`,
+    t`Get Ryte app on your iPhone or Android device and access all your notes on the go.`,
   joinCommunity: () => t`Join community`,
   license: () => t`License`,
   licenseDescription: () => t`GNU GENERAL PUBLIC LICENSE Version 3`,
@@ -1971,12 +1971,12 @@ Please note that we will respond to your feature request on the link above. **We
   advanced: () => t`Advanced`,
   useCustomDns: () => t`Use custom DNS`,
   customDnsDescription: () =>
-    t`Notesnook uses the following DNS providers:
+    t`Ryte uses the following DNS providers:
 
 1. Cloudflare DNS
 2. Quad9
 
-This can sometimes bypass local ISP blockages on Notesnook traffic. Disable this if you want the app to use system's DNS settings.`,
+This can sometimes bypass local ISP blockages on Ryte traffic. Disable this if you want the app to use system's DNS settings.`,
   changeProxy: () => t`Change proxy`,
   proxy: () => t`Proxy`,
   proxyDescription: () =>
@@ -2046,7 +2046,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   pasteAndMatchStyle: () => t`Paste and match style`,
   pasteWithoutFormatting: () => t`Paste without formatting`,
   configure: () => t`Configure`,
-  usingOfficialInstance: () => t`Using official Notesnook instance`,
+  usingOfficialInstance: () => t`Using official Ryte instance`,
   usingInstance: (instance: string, version: string) =>
     t`Using ${instance} (v${version})`,
 
@@ -2198,7 +2198,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   failed: () => t`Failed`,
   cacheClearedDesc: () => t`All cached attachments have been cleared.`,
   restoreBackupConfirm: () => t`Restore backup?`,
-  serversConfigurationDesc: () => t`Configure server URLs for Notesnook`,
+  serversConfigurationDesc: () => t`Configure server URLs for Ryte`,
   error: () => t`Error`,
   deleteContainingNotes: (count: number) =>
     plural(count, {
@@ -2232,7 +2232,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   recents: () => t`Recents`,
   removeFromRecents: () => t`Remove from recents`,
   releaseTrack: () => t`Release track`,
-  releaseTrackDesc: () => t`Select the release track for Notesnook.`,
+  releaseTrackDesc: () => t`Select the release track for Ryte.`,
   stable: () => t`Stable`,
   beta: () => t`Beta`,
   zoom: () => t`Zoom`,
@@ -2316,7 +2316,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   exploreAllPlans: () => t`Explore all plans`,
   tryPlanForFree: (plan: string) => t`Try ${plan} for free`,
   plan: (plan: string) => t`${plan} plan`,
-  notesnookPlans: [() => t`Notesnook`, () => t`Plans`],
+  notesnookPlans: [() => t`Ryte`, () => t`Plans`],
   readyToTakeNextStep: () =>
     t`Ready to take the next step on your private note taking journey?`,
   percentOff: (discount: string) => t`${discount}% off`,
@@ -2363,7 +2363,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   unlimited: () => t`Unlimited`,
   fiveYearPlan: () => t`5 year plan (One time purchase)`,
   educationPlan: () => t`Education plan`,
-  welcomeToPlan: (plan: string) => t`Welcome to Notesnook ${plan}`,
+  welcomeToPlan: (plan: string) => t`Welcome to Ryte ${plan}`,
   thankYouForPurchase: () => t`Thank you for the purchase`,
   changePlan: () => t`Change plan`,
   contactSupportToChangePlan: () =>
@@ -2377,13 +2377,13 @@ Use this if changes from other devices are not appearing on this device. This wi
     t`Your current subscription does not allow changing plans`,
   upgradeToRedeem: () => t`Upgrade to redeem`,
   redeemCode: () => t`Redeem code`,
-  notesnookCircle: () => t`Notesnook Circle`,
+  notesnookCircle: () => t`Ryte Circle`,
   notesnookCircleDesc: () =>
-    t`Notesnook Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom.`,
+    t`Ryte Circle brings together trusted partners who share our commitment to privacy, transparency, and user freedom.`,
   trialUserCircleNotice: () =>
-    `Notesnook Circle is reserved for members with an active subscription. You'll get full access after your trial period is over and your subscription is confirmed.`,
+    `Ryte Circle is reserved for members with an active subscription. You'll get full access after your trial period is over and your subscription is confirmed.`,
   freeUserCircleNotice: () =>
-    t`The Notesnook Circle is exclusive to subscribers. Please consider subscribing to gain access to Notesnook Circle and enjoy additional benefits.`,
+    t`The Ryte Circle is exclusive to subscribers. Please consider subscribing to gain access to Ryte Circle and enjoy additional benefits.`,
   finishPurchaseInBrowser: () => t`Finish your purchase in the browser.`,
   goBack: () => t`Go back`,
   clickToDirectlyClaimPromo: () =>
@@ -2421,7 +2421,7 @@ Use this if changes from other devices are not appearing on this device. This wi
   confirmationEmailSent: () => t`Confirmation email sent`,
   inboxAPI: () => t`Inbox API`,
   inboxAPIDesc: () =>
-    t`Share things to Notesnook from anywhere using the Inbox API`,
+    t`Share things to Ryte from anywhere using the Inbox API`,
   enableInboxAPI: () => t`Enable Inbox API`,
   enableInboxAPIDesc: () => t`Enable/Disable Inbox API`,
   manageInboxKeys: () => t`Inbox PGP Keys`,
@@ -2546,7 +2546,7 @@ Continue without attachments?`,
   openingLocalFileDesc: (filePath: string) =>
     t`Are you sure you want to open this file: ${filePath}?`,
   cantOpenFileLinksInBrowsers: () =>
-    t`File links cannot be opened in browsers. Please use the Notesnook desktop app.`,
+    t`File links cannot be opened in browsers. Please use the Ryte desktop app.`,
   expiryDateMustBeInTheFuture: () => t`Expiry date must be in the future`,
   expiryDateCannotBeMoreThan1YearInTheFuture: () =>
     t`Expiry date cannot be more than 1 year in the future`,
@@ -2582,7 +2582,7 @@ Continue without attachments?`,
   versionDeleted: () => actions.deleted.version(1),
   offlineMode: () => t`Offline mode`,
   offlineModeDesc: () =>
-    t`Using Notesnook without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
+    t`Using Ryte without an account will **NOT** sync your notes across devices and could result in data loss if you lose access to your device or uninstall the app. Make sure to backup your notes regularly.`,
   alignment: () => t`Alignment`,
   whatAreMonographs: () => t`What are monographs?`,
   webTips: [
@@ -2829,7 +2829,7 @@ Continue without attachments?`,
   wrappedYear: (year: number | string) => t`Wrapped ${year} 🎉`,
   yourYearWrapped: (year: number | string) => t`Your ${year} Wrapped`,
   letsLookBackAtYourYearInNotesnook: () =>
-    t`Let's look back at your year in Notesnook`,
+    t`Let's look back at your year in Ryte`,
   youCreated: () => t`You created`,
   notesThisYear: () => t`notes this year`,
   wrappedNotesSubtext: () =>
@@ -2860,7 +2860,7 @@ Continue without attachments?`,
   savePercentBySwitchingPlan: (savings: string, period: string) =>
     t`Save ${savings}% by switching to ${period} plan.`,
   alreadySubscribedChangeFromSettings: () =>
-    t`You already have a Notesnook subscription. You can change your plan from Settings > Subscription details.`,
+    t`You already have a Ryte subscription. You can change your plan from Settings > Subscription details.`,
   youAreAwesome: () => t`You are awesome!`,
   thankYouForSupportingPrivacy: () =>
     t`Thank you for supporting privacy! Your subscription is now active.`,
@@ -2985,7 +2985,7 @@ Continue without attachments?`,
   showApp: () => t`Show app`,
   degradedPerformanceWarning: () => t`Degraded Performance Warning`,
   arm64TranslationWarning: () =>
-    t`Notesnook detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Notesnook from our website.`,
+    t`Ryte detected that it is running under ARM64 translation. For the best performance, please download the ARM64 build of Ryte from our website.`,
   backupDirMigrationFailed: () => t`Backup Directory Migration Failed`,
   backupDirMigrationFailedDesc: () =>
     t`Failed to migrate backup directory. It has been reset to default.`,
@@ -3041,7 +3041,7 @@ Continue without attachments?`,
   exportingNotePath: (path: string) => t`Exporting note: ${path}`,
   focusedOnPrivacy: () => t`Focused on privacy`,
   focusedOnPrivacyDesc: () =>
-    t`Everything you do in Notesnook stays private. We use XChaCha20-Poly1305-IETF and Argon2 to encrypt your notes.`,
+    t`Everything you do in Ryte stays private. We use XChaCha20-Poly1305-IETF and Argon2 to encrypt your notes.`,
   zeroAdsAndZeroTrackers: () => t`Zero ads & zero trackers`,
   onDeviceEncryption: () => t`On device encryption`,
   secureAppLockForAll: () => t`Secure app lock for all`,
@@ -3057,7 +3057,7 @@ Continue without attachments?`,
     t`* Disable sync completely, turn off auto sync, or just disable real-time editor sync.`,
   crossPlatform100: () => t`100% cross platform`,
   crossPlatform100Desc: () =>
-    t`Notesnook is available on all major platforms — for everyone.`,
+    t`Ryte is available on all major platforms — for everyone.`,
   twoFactorAuthFeatureDesc: () =>
     t`Improve your account security & prevent intruders from accessing your notes using 2FA.`,
   twoFactorEmail: () => t`Email*`,
@@ -3119,7 +3119,7 @@ Continue without attachments?`,
   autoBackupsMonthlyWeeklyDaily: () =>
     t`Automatic monthly, weekly & daily backups`,
   personalizeMakeNotesnookYourOwn: () =>
-    t`Personalize & make Notesnook your own`,
+    t`Personalize & make Ryte your own`,
   personalizeMakeNotesnookYourOwnDesc: () =>
     t`Change app themes to match your style. Custom themes are coming soon.`,
   themes10Plus: () => t`10+ themes`,
@@ -3129,7 +3129,7 @@ Continue without attachments?`,
   loadingCheckoutPleaseWait: () => t`Loading checkout. Please wait...`,
   finalStepMakePayment: () => t`Final step, make the payment.`,
   oneStepAwayFromUnlocking: () =>
-    t`You are one step away from unlocking the full potential of Notesnook.`,
+    t`You are one step away from unlocking the full potential of Ryte.`,
   summary: () => t`Summary`,
   planWithTitle: (planTitle: string) => t`${planTitle} plan`,
   notFound: () => t`Not found`,
@@ -3263,7 +3263,7 @@ Continue without attachments?`,
   moveNodeUp: () => t`Move parent node up`,
   moveNodeDown: () => t`Move parent node down`,
   clearCurrentLine: () => t`Clear current line`,
-  welcomeToNotesnookBeta: () => t`Welcome to Notesnook Beta!`,
+  welcomeToNotesnookBeta: () => t`Welcome to Ryte Beta!`,
   highlightsWithStars: () => t`✨ Highlights ✨`,
   welcomeToVersion: (version: string) => t`Welcome to v${version}`,
   failedToGetInvoiceForTransaction: (error: string) =>

@@ -19,42 +19,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { useMemo } from "react";
 import { Button, Flex, Image, Text } from "@theme-ui/components";
-import { getRandom, usePromise } from "@notesnook/common";
-import Holenstein from "../../assets/testimonials/holenstein.jpg";
-import Jason from "../../assets/testimonials/jason.jpg";
-import Cameron from "../../assets/testimonials/cameron.jpg";
-import { hosts } from "@notesnook/core";
+import { getRandom } from "@notesnook/common";
 import { SettingsDialog } from "../../dialogs/settings";
 import { strings } from "@notesnook/intl";
 import { FixedColorSchemeThemeProvider } from "../theme-provider";
 
-const testimonials = [
-  {
-    username: "HolensteinDan",
-    image: Holenstein,
-    name: "Dan Holenstein",
-    link: "https://twitter.com/HolensteinDan/status/1439728355935342592",
-    text: "@notesnook app is what @evernote should have become long ago. And they're still improving."
-  },
-  {
-    username: "jasonbereklewis",
-    image: Jason,
-    name: "Jason Berek-Lewis",
-    link: "https://twitter.com/jasonbereklewis/status/1438635808727044098",
-    text: "I work in content writing and communications. My day starts and ends in Notesnook. My Chrome app is always open; it's where I take all my notes. The clean design, focus mode, the tagging and color coding are all features that help keep my work organised every day."
-  },
-  {
-    username: "camflint",
-    image: Cameron,
-    name: "Cameron Flint",
-    link: "https://twitter.com/camflint/status/1481061416434286592",
-    text: "I'm pretty impressed at the progress @notesnook are making on their app — particularly in respect to how performant the app runs and behaves, despite the overhead of end-to-end encrypting user data."
-  }
+// Ryte: what makes Ryte different, shown next to the sign-in form
+const RYTE_POINTS = [
+  "Every feature included. No plans, no paywalls, no upload limits.",
+  "Your notes live in your own MEGA or Filen account, in the \"Ryte\" folder.",
+  "End-to-end encrypted on your device before anything is uploaded."
 ];
-
-function getRandomTestimonial() {
-  return testimonials[getRandom(0, testimonials.length - 1)];
-}
 
 function randomTitle() {
   return strings.webAuthTitles[
@@ -63,15 +38,7 @@ function randomTitle() {
 }
 
 function AuthContainer(props) {
-  const testimonial = useMemo(() => getRandomTestimonial(), []);
   const title = useMemo(() => randomTitle(), []);
-
-  const version = usePromise(
-    async () =>
-      await fetch(`${hosts.API_HOST}/version`)
-        .then((r) => r.json())
-        .catch(() => undefined)
-  );
 
   return (
     <Flex
@@ -116,30 +83,19 @@ function AuthContainer(props) {
           <Text variant={"heading"} sx={{ fontSize: 48 }}>
             {title}
           </Text>
-          <Text
-            variant="body"
-            mt={10}
-            sx={{ fontSize: 16, color: "paragraph-secondary" }}
-          >
-            {testimonial.text}
-          </Text>
-          <Flex mt={2} sx={{ alignItems: "center", justifyContent: "center" }}>
-            <Image
-              src={testimonial.image}
-              sx={{ borderRadius: 50, width: 40 }}
-            />
-            <Flex ml={2} sx={{ flexDirection: "column" }}>
-              <Text variant="body" sx={{ fontSize: 16, fontWeight: "bold" }}>
-                {testimonial.name}
+          <Flex mt={10} sx={{ flexDirection: "column", gap: 2 }}>
+            {RYTE_POINTS.map((point) => (
+              <Text
+                key={point}
+                variant="body"
+                sx={{ fontSize: 16, color: "paragraph-secondary" }}
+              >
+                ✓ {point}
               </Text>
-              <Text variant="subBody" sx={{ fontSize: 13 }}>
-                @{testimonial.username}
-              </Text>
-            </Flex>
+            ))}
           </Flex>
-
           <Flex
-            mt={2}
+            mt={4}
             pt={2}
             sx={{
               justifyContent: "space-between",
@@ -148,24 +104,13 @@ function AuthContainer(props) {
             }}
           >
             <Text variant={"subBody"}>
-              {version.status === "fulfilled" &&
-              !!version.value &&
-              version.value.instance !== "default" ? (
-                <>
-                  {strings.usingInstance(
-                    version.value.instance,
-                    version.value.version
-                  )}
-                </>
-              ) : (
-                <>{strings.usingOfficialInstance()}</>
-              )}
+              Ryte is free software (GPL-3.0), based on Notesnook.
             </Text>
             <Button
               variant="anchor"
-              onClick={() => SettingsDialog.show({ activeSection: "servers" })}
+              onClick={() => SettingsDialog.show({ activeSection: "about" })}
             >
-              {strings.configure()}
+              {strings.about()}
             </Button>
           </Flex>
         </Flex>

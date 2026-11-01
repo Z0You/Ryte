@@ -50,6 +50,7 @@ import {
 import { logger } from "../utils/logger";
 import { newQueue } from "@henrygd/queue";
 import { strings } from "@notesnook/intl";
+import { ryteCloud } from "../ryte/cloud";
 
 export const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -256,10 +257,9 @@ async function uploadFile(
     return true;
 
   try {
-    const uploaded =
-      fileHandle.file.size < MINIMUM_MULTIPART_FILE_SIZE
-        ? await singlePartUploadFile(fileHandle, filename, requestOptions)
-        : await multiPartUploadFile(fileHandle, filename, requestOptions);
+    // Ryte: attachments go to the "Ryte Files" folder of the user's own
+    // MEGA / Filen drive (already encrypted on this device).
+    const uploaded = await ryteUploadFile(fileHandle, filename);
 
     if (uploaded) {
       await checkUpload(
@@ -506,26 +506,19 @@ async function downloadFile(
       { type: "download", hash: filename }
     );
 
-    const signedUrlResponse = await axios
-      .get(url, { headers, responseType: "text" })
-      .catch((e) => {
-        if (e.response?.status === 401) {
-          showToast("error", strings.pleaseLoginToDownloadAttachments());
-          return null;
-        }
-        throw e;
-      });
-    if (!signedUrlResponse) {
-      reportProgress(undefined, { type: "download", hash: filename });
-      return false;
+    // Ryte: download from the "Ryte Files" folder of the user's drive
+    const encrypted = await ryteCloud.files().download(filename);
+    if (!encrypted) {
+      const error = `This attachment was not found in your cloud storage. Upload it again from the device that has it. (File hash: ${filename})`;
+      await db.attachments.markAsFailed(attachment.id, error);
+      throw new Error(error);
     }
-    const signedUrl = signedUrlResponse.data;
-
-    logger.debug("Got attachment signed url", { filename });
-
-    const response = await fetch(signedUrl, {
-      signal
+    const response = new Response(encrypted, {
+      headers: { "content-length": String(encrypted.byteLength) }
     });
+    void signal;
+    void url;
+    void headers;
 
     const size = parseInt(response.headers.get("content-length") || "0");
 
@@ -541,11 +534,6 @@ async function downloadFile(
       const error = `File length mismatch. Expected ${attachment.size} but got ${decryptedLength} bytes. Please upload this file again from the attachment manager. (File hash: ${filename})`;
       await db.attachments.markAsFailed(attachment.id, error);
       throw new Error(error);
-    }
-
-    if (response.headers.get("content-type") === "application/xml") {
-      const error = parseS3Error(await response.text());
-      throw new Error(`[${error.Code}] ${error.Message}`);
     }
 
     const tempFileHandle = await streamablefs.createFile(
@@ -668,14 +656,9 @@ async function deleteFile(
     );
 
   try {
-    const { url, headers } = requestOptions;
-    const response = await axios.delete(url, {
-      headers: headers
-    });
-
-    const result = isSuccessStatusCode(response.status);
-    if (result) await streamablefs.deleteFile(filename);
-    return result;
+    await ryteCloud.files().remove([filename]);
+    await streamablefs.deleteFile(filename);
+    return true;
   } catch (e) {
     showError(toS3Error(e), "Could not delete file");
     return false;
@@ -692,12 +675,9 @@ async function bulkDeleteFiles(
   }
 
   try {
-    const { url, headers } = requestOptions;
-    const response = await axios.post(url, { names: filenames }, { headers });
-
-    const result = isSuccessStatusCode(response.status);
-    if (result) await streamablefs.bulkDeleteFiles(filenames);
-    return result;
+    await ryteCloud.files().remove(filenames);
+    await streamablefs.bulkDeleteFiles(filenames);
+    return true;
   } catch (e) {
     showError(toS3Error(e), "Could not bulk delete files");
     return false;
@@ -713,22 +693,22 @@ async function bulkDeleteFiles(
  */
 export async function getUploadedFileSize(filename: string) {
   try {
-    const url = `${hosts.API_HOST}/s3?name=${filename}`;
-    const token = await db.tokenManager.getAccessToken();
-
-    const attachmentInfo = await axios.head(url, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    const contentLength = parseInt(
-      attachmentInfo.headers["x-object-size"] ??
-        attachmentInfo.headers["content-length"]
-    );
-    return isNaN(contentLength) ? 0 : contentLength;
+    return await ryteCloud.files().size(filename);
   } catch (e) {
     logger.error(e, "Failed to get uploaded file size.", { filename });
     return -1;
   }
+}
+
+/** Ryte: uploads the encrypted file to the user's drive. */
+async function ryteUploadFile(fileHandle: FileHandle, filename: string) {
+  const total = (await fileHandle.size()) || fileHandle.file.size + ABYTES;
+  reportProgress({ total, loaded: 0 }, { type: "upload", hash: filename });
+  const blob = await fileHandle.toBlob();
+  const data = new Uint8Array(await blob.arrayBuffer());
+  await ryteCloud.files().upload(filename, data);
+  reportProgress({ total, loaded: total }, { type: "upload", hash: filename });
+  return true;
 }
 
 function clearFileStorage() {

@@ -49,6 +49,7 @@ import { TipManager } from "./services/tip-manager";
 import { useSettingStore } from "./stores/use-setting-store";
 import { changeSystemBarColors, useThemeStore } from "./stores/use-theme-store";
 import { useUserStore } from "./stores/use-user-store";
+import { RyteBridgeHost } from "./ryte/bridge-host";
 I18nManager.allowRTL(false);
 I18nManager.forceRTL(false);
 I18nManager.swapLeftAndRightInRTL(false);
@@ -112,6 +113,7 @@ const App = (props: { configureMode?: "note-preview" }) => {
         </ScopedThemeProvider>
         <DialogProvider />
         <AppLocked />
+        {props.configureMode ? null : <RyteBridgeHost />}
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );

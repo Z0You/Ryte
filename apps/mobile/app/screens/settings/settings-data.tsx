@@ -70,6 +70,8 @@ import { refreshAllStores } from "../../stores/create-db-collection-store";
 import { useSettingStore } from "../../stores/use-setting-store";
 import { useThemeStore } from "../../stores/use-theme-store";
 import { useUserStore } from "../../stores/use-user-store";
+import { RyteCloud } from "../../ryte/bridge";
+import { AuthMode } from "../../components/auth/common";
 import { EDITOR_LINE_HEIGHT } from "../../utils/constants";
 import {
   eAfterSync,
@@ -1939,17 +1941,82 @@ export function getSettingsGroups(): SettingSection[] {
   ];
 }
 
+/**
+ * Ryte: settings that need a Notesnook account, plan or server are hidden.
+ */
+const RYTE_HIDDEN_SETTINGS = new Set([
+  "subscription-status",
+  "redeem-gift-code",
+  "recovery-key",
+  "change-password",
+  "change-email",
+  "2fa-settings",
+  "subscription-not-active",
+  "delete-account",
+  "notesnook-circle",
+  "inbox-api",
+  "servers",
+  "disable-realtime-sync"
+]);
+
+function ryteSettings(groups: SettingSection[]): SettingSection[] {
+  const visit = (sections: SettingSection[]): SettingSection[] =>
+    sections.map((section) => ({
+      ...section,
+      hidden: RYTE_HIDDEN_SETTINGS.has(section.id) ? () => true : section.hidden,
+      sections: section.sections ? visit(section.sections) : undefined
+    }));
+  const result = visit(groups);
+  const account = result.find((group) => group.id === "account");
+  account?.sections?.unshift({
+    id: "ryte-cloud-storage",
+    name: "Cloud storage",
+    icon: "cloud-outline",
+    useHook: () => useUserStore((state) => state.user),
+    description: () => {
+      const status = RyteCloud.status();
+      if (!status)
+        return "Not connected. Tap to connect MEGA or Filen and resume syncing.";
+      const user = useUserStore.getState().user;
+      const quota =
+        user?.totalStorage && user.totalStorage > 0
+          ? ` · ${formatBytes(user.storageUsed || 0)} of ${formatBytes(
+              user.totalStorage
+            )} used`
+          : "";
+      return `Syncing with ${status.displayName} as ${status.email}${quota}`;
+    },
+    modifer: () => {
+      if (RyteCloud.status()) {
+        presentDialog({
+          title: "Reconnect cloud storage?",
+          paragraph:
+            "Sign in to your MEGA or Filen account again (for example after changing its password). Your notes stay on this device.",
+          positiveText: "Reconnect",
+          negativeText: strings.cancel(),
+          positivePress: async () => {
+            await RyteCloud.disconnect();
+            Navigation.navigate("Auth", { mode: AuthMode.login });
+            return true;
+          }
+        });
+      } else Navigation.navigate("Auth", { mode: AuthMode.login });
+    }
+  });
+  return result;
+}
+
 export function useSettingsGroups(): SettingSection[] {
   const appLanguage = useSettingStore((state) => state.settings.appLanguage);
 
-  return React.useMemo(() => getSettingsGroups(), [appLanguage]);
+  return React.useMemo(() => ryteSettings(getSettingsGroups()), [appLanguage]);
 }
 
 export const settingsGroups: SettingSection[] = new Proxy(
   [] as SettingSection[],
   {
     get(target, prop, receiver) {
-      const groups = getSettingsGroups();
+      const groups = ryteSettings(getSettingsGroups());
       const value = Reflect.get(groups, prop, groups);
       return typeof value === "function" ? value.bind(groups) : value;
     }

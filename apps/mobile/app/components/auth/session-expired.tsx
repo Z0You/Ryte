@@ -46,6 +46,8 @@ import { IconButton } from "../ui/icon-button";
 import Heading from "../ui/typography/heading";
 import Paragraph from "../ui/typography/paragraph";
 import { LoginSteps, useLogin } from "./use-login";
+import Navigation from "../../services/navigation";
+import { AuthMode } from "./common";
 import { strings } from "@notesnook/intl";
 import { getObfuscatedEmail } from "../../utils/functions";
 import { DefaultAppStyles } from "../../utils/styles";
@@ -87,41 +89,14 @@ export const SessionExpired = () => {
     }
   };
 
+  // Ryte: when the keys or the cloud session are gone, the user connects
+  // their storage and enters the encryption password again.
   const open = React.useCallback(async () => {
-    try {
-      const res = await db.tokenManager.getToken();
-      if (!res) throw new Error("no token found");
-      if (db.tokenManager._isTokenExpired(res))
-        throw new Error("token expired");
-
-      const key = await db.user.getDataEncryptionKeys();
-      if (!key) throw new Error("No encryption key found.");
-
-      Sync.run("global", false, "full", async (complete) => {
-        if (!complete) {
-          const user = await db.user.getUser();
-          if (!user) return;
-          formRef.current.setValue("email", user.email);
-          setVisible(true);
-          setFocused(false);
-          return;
-        }
-        SettingsService.set({
-          sessionExpired: false
-        });
-        setVisible(false);
-      });
-    } catch (e) {
-      const user = await db.user.getUser();
-      if (!user) return;
-      formRef.current.setValue("email", user.email);
-      setFocused(false);
-      setVisible(true);
-      useUserStore.setState({
-        disableAppLockRequests: true
-      });
-    }
-  }, [formRef]);
+    const user = await db.user.getUser();
+    if (!user) return;
+    setVisible(false);
+    Navigation.navigate("Auth", { mode: AuthMode.login });
+  }, []);
 
   useEffect(() => {
     const sub = eSubscribeEvent(eLoginSessionExpired, open);

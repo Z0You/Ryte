@@ -1,0 +1,60 @@
+name: Ryte Web
+
+# Builds the Ryte web app on every push to main (and on demand) and uploads
+# it as an artifact (ryte-web). It is a static site: host the folder on any
+# static host (Cloudflare Pages, Netlify, your own server) at the root of a
+# domain or subdomain.
+#
+# Optional: to publish to Cloudflare Pages automatically, add the repository
+# secrets CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN and the variable
+# CLOUDFLARE_PROJECT (the Pages project name).
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "apps/mobile/**"
+      - ".github/workflows/ryte-android.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ryte-web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Install node modules
+        run: |
+          npm ci --ignore-scripts --prefer-offline --no-audit
+          npm run bootstrap -- --scope=web
+
+      - name: Build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: npm run build:web
+
+      - name: Upload web build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ryte-web
+          path: apps/web/build
+
+      - name: Publish to Cloudflare Pages (if configured)
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && vars.CLOUDFLARE_PROJECT != '' }}
+        working-directory: ./apps/web
+        run: npx --yes wrangler pages deploy --project-name=${{ vars.CLOUDFLARE_PROJECT }} ./build/

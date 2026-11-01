@@ -99,13 +99,15 @@ const sectionGroups: SectionGroup[] = [
         key: "subscription",
         title: strings.subDetails(),
         icon: Pro,
-        isHidden: () => !useUserStore.getState().isLoggedIn
+        // Ryte: no Notesnook account, plans or servers
+        isHidden: () => true
       },
       {
         key: "auth",
         title: strings.authentication(),
         icon: PasswordAndAuth,
-        isHidden: () => !useUserStore.getState().isLoggedIn
+        // Ryte: no Notesnook account, plans or servers
+        isHidden: () => true
       },
       {
         key: "sync",
@@ -117,13 +119,15 @@ const sectionGroups: SectionGroup[] = [
         key: "circle",
         title: strings.notesnookCircle(),
         icon: CircleEmpty,
-        isHidden: () => !useUserStore.getState().isLoggedIn
+        // Ryte: no Notesnook account, plans or servers
+        isHidden: () => true
       },
       {
         key: "inbox",
         title: strings.inbox(),
         icon: Inbox,
-        isHidden: () => !useUserStore.getState().isLoggedIn
+        // Ryte: no Notesnook account, plans or servers
+        isHidden: () => true
       }
     ]
   },
@@ -145,7 +149,13 @@ const sectionGroups: SectionGroup[] = [
         title: strings.notifications(),
         icon: Notification
       },
-      { key: "servers", title: strings.servers(), icon: Servers }
+      {
+        key: "servers",
+        title: strings.servers(),
+        icon: Servers,
+        // Ryte: syncs through MEGA / Filen, there are no servers to configure
+        isHidden: () => true
+      }
     ]
   },
   {

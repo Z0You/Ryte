@@ -49,17 +49,17 @@ async function getDirectoryAndroid() {
   const folder = await ScopedStorage.openDocumentTree(true);
   if (!folder) return null;
   let subfolder;
-  if (!folder.name.includes("Notesnook backups")) {
+  if (!folder.name.includes("Ryte backups")) {
     const files = await ScopedStorage.listFiles(folder.uri);
     for (const file of files) {
-      if (file.type === "directory" && file.name === "Notesnook backups") {
+      if (file.type === "directory" && file.name === "Ryte backups") {
         subfolder = file;
       }
     }
     if (!subfolder) {
       subfolder = await ScopedStorage.createDirectory(
         folder.uri,
-        "Notesnook backups"
+        "Ryte backups"
       );
     }
   } else {

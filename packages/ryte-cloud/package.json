@@ -1,0 +1,15 @@
+{
+  "name": "@ryte/cloud",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ryte: MEGA and Filen cloud storage for sync (web + Android bridge)",
+  "license": "GPL-3.0-or-later",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build:bridge": "node scripts/build-bridge.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.21.5"
+  }
+}

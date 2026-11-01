@@ -101,6 +101,28 @@ export default defineConfig({
 
     alias: [
       {
+        // Ryte: MEGA / Filen cloud storage (shared with the Android app)
+        find: /^@ryte\/cloud$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/ryte-cloud/src/index.ts"
+        )
+      },
+      {
+        find: /^@ryte\/megajs$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/ryte-cloud/vendor/megajs/megajs.browser.mjs"
+        )
+      },
+      {
+        find: /^@ryte\/filen-sdk$/,
+        replacement: path.resolve(
+          __dirname,
+          "../../packages/ryte-cloud/vendor/filen-sdk/filen-sdk.browser.mjs"
+        )
+      },
+      {
         find: /\/desktop-bridge$/gm,
         replacement: isDesktop
           ? "/desktop-bridge/index.desktop"

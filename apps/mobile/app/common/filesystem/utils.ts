@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { hosts, RequestOptions } from "@notesnook/core";
 import { Platform } from "react-native";
+import { RyteFiles } from "../../ryte/bridge";
 import RNFetchBlob from "react-native-blob-util";
 import * as ScopedStorage from "react-native-scoped-storage";
 import { DatabaseLogger, db } from "../database";
@@ -119,40 +120,12 @@ function getFileSizeFromHeaders(headers: Headers) {
   return headers.get("x-object-size") || headers.get("content-length");
 }
 
-export async function getUploadedFileSize(hash: string, retry = 0) {
+export async function getUploadedFileSize(hash: string) {
+  // Ryte: size of the encrypted file in the "Ryte Files" folder of the drive
   try {
-    const url = `${hosts.API_HOST}/s3?name=${hash}`;
-    const token = await db.tokenManager.getAccessToken();
-    const attachmentInfo = await fetch(url, {
-      method: "HEAD",
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    const fileSize = getFileSizeFromHeaders(attachmentInfo.headers);
-
-    if (!attachmentInfo.ok || fileSize === null) {
-      if (retry < 3) {
-        DatabaseLogger.log(`Retrying file size check: ${hash}, ${retry}`);
-        return getUploadedFileSize(hash, retry + 1);
-      }
-      throw new Error(
-        `File size check failed: ${hash}, ${attachmentInfo.status}, ${fileSize}`
-      );
-    }
-
-    console.log(attachmentInfo.headers);
-
-    const contentLength = parseInt(fileSize as string);
-    return isNaN(contentLength) ? FileSizeResult.Empty : contentLength;
+    return await RyteFiles.size(hash);
   } catch (e) {
-    if (retry < 3) {
-      DatabaseLogger.log(
-        `Retrying file size check after error: ${hash}, ${retry}`
-      );
-      await new Promise((resolve) => setTimeout(resolve, 500 * (retry + 1)));
-      return getUploadedFileSize(hash, retry + 1);
-    }
-    DatabaseLogger.error(e);
+    DatabaseLogger.error(e, "Failed to get uploaded file size", { hash });
     return FileSizeResult.Error;
   }
 }

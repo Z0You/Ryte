@@ -486,7 +486,12 @@ export async function logout() {
     type: "modal",
     title: strings.loggingOut(),
     subtitle: strings.pleaseWait(),
-    action: () => db.user.logout(true)
+    action: async () => {
+      await db.user.logout(true);
+      // Ryte: also forget the MEGA / Filen session on this device
+      const { ryteCloud } = await import("../ryte/cloud");
+      await ryteCloud.disconnect().catch(() => undefined);
+    }
   });
   showToast("success", strings.loggedOut());
 }

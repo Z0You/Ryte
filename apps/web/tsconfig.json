@@ -7,7 +7,14 @@
     "moduleResolution": "Bundler",
     "noEmit": true,
     "paths": {
-      "@nn/test": ["./__e2e__/utils/test.ts"]
+      "@nn/test": ["./__e2e__/utils/test.ts"],
+      "@ryte/cloud": ["../../packages/ryte-cloud/src/index.ts"],
+      "@ryte/megajs": [
+        "../../packages/ryte-cloud/vendor/megajs/megajs.browser.d.mts"
+      ],
+      "@ryte/filen-sdk": [
+        "../../packages/ryte-cloud/vendor/filen-sdk/filen-sdk.browser.d.mts"
+      ]
     }
   },
   "include": ["src", "global.d.ts", "__tests__", "__e2e__"]

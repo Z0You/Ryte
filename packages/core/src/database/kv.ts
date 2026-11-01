@@ -37,6 +37,14 @@ interface KV {
    * Revision of the user when the current master key was set.
    */
   masterKeyRevision: number;
+  /** Ryte: last sync log applied from each other device. */
+  ryteCursors: Record<string, number>;
+  /** Ryte: number of the last sync log this device wrote. */
+  ryteSeq: number;
+  /** Ryte: name of the last snapshot applied on this device. */
+  ryteSnapshot: string;
+  /** Ryte: send every local item on the next sync (set on sign-in). */
+  ryteForcePush: boolean;
 }
 
 export const KEYS: (keyof KV)[] = [
@@ -48,7 +56,11 @@ export const KEYS: (keyof KV)[] = [
   "deviceId",
   "lastBackupTime",
   "lastFullBackupTime",
-  "fullOfflineMode"
+  "fullOfflineMode",
+  "ryteCursors",
+  "ryteSeq",
+  "ryteSnapshot",
+  "ryteForcePush"
 ];
 
 export class KVStorage {
