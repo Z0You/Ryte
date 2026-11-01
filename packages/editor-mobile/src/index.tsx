@@ -1,0 +1,68 @@
+/*
+This file is part of the Notesnook project (https://notesnook.com/)
+
+Copyright (C) 2023 Streetwriters (Private) Limited
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+import "./polyfill";
+import "./utils/index";
+import "./utils/commands";
+import { i18n, initLocale, setI18nGlobal } from "@notesnook/intl";
+import "@notesnook/editor/styles/fonts.mobile.css";
+import "@notesnook/editor/styles/katex-fonts.mobile.css";
+import "@notesnook/editor/styles/katex.min.css";
+import "@notesnook/editor/styles/styles.css";
+import { createRoot } from "react-dom/client";
+import "./index.css";
+
+setTimeout(() => {
+  if (globalThis.__DEV__) {
+    const logFn = global.console.log;
+    global.console.log = function () {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      // eslint-disable-next-line prefer-rest-params
+      logFn.apply(console, arguments);
+      // eslint-disable-next-line prefer-rest-params
+      globalThis.logger("info", ...arguments);
+    };
+  }
+}, 1000);
+let appLoaded = false;
+async function loadApp() {
+  if (appLoaded) return;
+  appLoaded = true;
+  if (globalThis.LINGUI_LOCALE_DATA) {
+    i18n.load(globalThis.LINGUI_LOCALE_DATA);
+    i18n.activate(globalThis.LINGUI_LOCALE || "en");
+    setI18nGlobal(i18n);
+  } else {
+    await initLocale({
+      systemLocale: navigator.language || "en"
+    });
+  }
+
+  const rootElement = document.getElementById("root");
+  if (rootElement) {
+    const root = createRoot(rootElement);
+    const App = require("./App").default;
+    root.render(<App />);
+  }
+}
+globalThis.loadApp = loadApp;
+
+if (process.env.NODE_ENV === "development") {
+  loadApp();
+}

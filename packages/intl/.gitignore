@@ -1,0 +1,5 @@
+.swc
+locales
+src/generated/
+generated/
+timestamp-*.mjs
